@@ -1,0 +1,20 @@
+{
+  "name": "WebMidiLearning",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "repository": "https://github.com/AceOfHeart5/WebMidiLearning.git",
+  "author": "Evan",
+  "license": "MIT",
+  "devDependencies": {
+    "html-webpack-plugin": "^4.3.0",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --history-api-fallback --inline --progress"
+  },
+  "dependencies": {
+    "vexflow": "^3.0.9"
+  }
+}

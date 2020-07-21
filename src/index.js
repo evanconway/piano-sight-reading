@@ -1,3 +1,4 @@
+import Vex from 'vexflow';
 const VF = Vex.Flow;
 
 // Create a VexFlow renderer attaced to the DIV element "boo"
