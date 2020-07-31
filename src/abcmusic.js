@@ -1,11 +1,11 @@
 const music = {
     title: "T:",
-    meter: "M:12/8",
+    meter: "M:C",
     noteLength: "L:1/4",
     key: "K:Eb",
     staffMarker: "%%staves {1,2}",
-    staffTop: "A'B/2,,_GF__ED^C",
-    staffBot: "G,B,DEF,A,C,A,",
+    staffTop: "A'B,,_GF__ED^CB''ABEGDBFGEBAGFBDGEBAGFBDGEBAGFBDGEBFGABDGEBFGABDGEBFGDBCF",
+    staffBot: "G,B,DEF,A,C,A,ABGFBDGEBGFBAGDBFGEBGABDGFBGEBFGDBAGDBBFGDBAGDBFGEBFGFBE",
     measuresPerLine: 5
 }
 
@@ -50,8 +50,6 @@ const generateABC = function() {
     result += music.meter + "\n";
     result += music.noteLength + "\n";
     result += music.key + "\n";
-    result += music.staffMarker + "\n";
-
     /* The staff marker is syntax that declares 2 staves that we can write
     notation to. After experimenting, it looks like writing `V:` lets us
     declare which staff we're writing to. The default cleff of a staff is
@@ -59,24 +57,52 @@ const generateABC = function() {
     also appears we have to set the key again as well. So the full line
     should be [K:A clef=bass]. Since we have to do this for each new line,
     I think it makes the most sense to just redeclare both staves after 
-    each line break.
-
-    I think the best way to handle line breaks is to copy the staff strings
-    into new strings, and then slowly pick them apart, inserting measures 
-    where needed. This means we need a way to A: determine the length in
-    time of a given abc note and B: determine the length of time of measures
-    given the M: tag in the header.
-    */
-
-    let tempTop = music.staffTop;
-    let tempBot = music.staffBot;
-
-    result += "V:1\n";
-    result += music.staffTop + "\n";
-    result += "V:2\n";
-    result += `[K:${music.key} clef=bass]\n`;
-    result += music.staffBot + "\n";
-
+    each line break. */
+    result += music.staffMarker + "\n";
+    const headerTop = `V:1\n[K:${music.key} clef=treble]\n`;
+    const headerBot = `V:2\n[K:${music.key} clef=bass]\n`;
+    /* Now comes line generation. First, we're not going to reference the staff
+    strings themselves, we'll be using our array functions so we can easily refer
+    to individual notes. */
+    const notesTop = getStaffArray(true);
+    const notesBot = getStaffArray(false);
+    /* We're going to iterate over these two arrays, creating lines and measures
+    from them. Lines are determined by number of measures. Measures are determined
+    by note length and meter. Using two separate indices, one for each staff/array,
+    we'll create lines unil all notes in both arrays have been iterated through. */
+    let iTop = 0;
+    let iBot = 0;
+    while (iTop < notesTop.length && iBot < notesBot.length) {
+        // generate top line
+        let lineTop = "";
+        /* This outer loop is for generating the correct number of measures. Observe
+        that we stop if the index reaches the end of the notes array*/
+        for (let m = 0; m < music.measuresPerLine && iTop < notesTop.length; m++) {
+            /* This inner loop is for generating a measure. Like line generation, we will 
+            stop if the index reaches the end of the array. */
+            for (let time = 0; time < getMeasureTime() && iTop < notesTop.length; iTop++) {
+                lineTop += notesTop[iTop];
+                time += getNoteTime(notesTop[iTop]);
+            }
+            lineTop += "|";
+        }
+        // generate bottom line, same logic as top
+        let lineBot = "";
+        for (let m = 0; m < music.measuresPerLine && iBot < notesBot.length; m++) {
+            for (let time = 0; time < getMeasureTime() && iBot < notesBot.length; iBot++) {
+                console.log(`Notes bot at ${iBot} is ${notesBot[iBot]}`);
+                lineBot += notesBot[iBot];
+                time += getNoteTime(notesBot[iBot]);
+            }
+            console.log("Measure created!");
+            lineBot += "|";
+        }
+        // add lines
+        result += headerTop;
+        result += lineTop + "\n";
+        result += headerBot;
+        result += lineBot + "\n";
+    }
     return result;
 }
 
