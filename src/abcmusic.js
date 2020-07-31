@@ -9,6 +9,102 @@ const music = {
     measuresPerLine: 5
 }
 
+// determine if input is a letter character
+const isLetter = function (letter) {
+    if (letter.length !== 1) return false;
+    /* The match function takes in a regex expression. It returns an array of elements in the 
+    string that match the expression. The expression below represents all letters. The function
+    returns null if no elements match. */
+    let match = letter.match(/[a-z]/i);
+    if (match === null) return false;
+    return true;
+}
+
+// Returns true if given character is one of the characters that could start an ABCjs note
+const isABCStart = function (char) {
+    return (isLetter(char) || char === "^" || char === "_");
+}
+
+// creates an array of individual abcjs notes from a staff
+const getStaffArray = function (topOrBot) {
+    /* Firstly, botOrTop is a boolean that determines if we're going to return an array of
+    the top staff for true, or the bottom staff for false. */
+    const staff = topOrBot ? music.staffTop : music.staffBot;
+    /* We're going to iterate over every character in the staff string, adding characters to
+    a temporary note string, and adding it to an array once it's complete (i.e. a new note 
+    string has started). */
+    const arr = [];
+    let note = "";
+    /* The only consistent element in every ABCjs note is a letter determining the pitch
+    class. But there can be an infinite number of pre and post letter modifiers. (Technically
+    there can be at most two pre modifiers, but I think it's easier to just assume infinite).
+    So we can't simply add the new note once we encounter one of the characters that signify 
+    the start of a new note. Those characters are: Letters, ^, and _. We can only add a note 
+    if a starting character has been encountered AND the temporary note has found a letter 
+    character. */
+    let hasLetter = false;
+    /* Before we begin the loop, we're going to get the note started with the first character.
+    If the first character is a letter, we need to set `hasLetter` to true so that if another
+    starting character is encountered, we can add note to the array and begin the process 
+    again.*/
+    note = music.staffTop[0];
+    hasLetter = isLetter(note);
+    // now for the loop
+    for (let i = 1; i < staff.length; i++) {
+        let c = staff[i];
+        // the logic is different if we've found a letter
+        if (hasLetter) {
+            /* In the case a letter has been found, we finish the note if the current
+            character is a starting character, continue as normal otherwise*/
+            if (isABCStart(c)) {
+                arr.push(note);
+                note = c;
+                hasLetter = isLetter(c);
+            } else note += c;
+        } else {
+            /* If a letter has not been found, we determine if the current character
+            is a letter, and add it regardless.*/
+            note += c;
+            hasLetter = isLetter(c);
+        }
+    }
+    arr.push(note); // add last note
+    return arr;
+}
+
+// returns length of time of each measure as a number
+const getMeasureTime = function () {
+    const meter = music.meter.slice(2, music.meter.length);
+    if (meter === "C") return 1;
+    const numerator = meter.split("/")[0];
+    const denominator = meter.split("/")[1];
+    return +numerator / +denominator; // + is shorthand to convert string to number
+}
+
+// returns the default note length set in the music object
+const getMusicDefaultLength = function () {
+    const length = music.noteLength.slice(2, music.noteLength.length);
+    if (length.indexOf("/") < 0) return +length;
+    const numerator = length.split("/")[0];
+    const denominator = length.split("/")[1];
+    return +numerator / +denominator; // + is shorthand to convert string to number
+}
+
+// returns length of time of abc note string as number
+const getNoteTime = function (abcNote) {
+    let divide = false;
+    let number = "";
+    for (let i = 0; i < abcNote.length; i++) {
+        if (abcNote[i] === "/") divide = true;
+        if (!isNaN(abcNote[i])) number += abcNote[i];
+    }
+    number = +number;
+    // At this point, if number is not 0, we are returning a modification of the default note length.
+    if (number === 0) return getMusicDefaultLength();
+    if (divide) return getMusicDefaultLength() / number;
+    else return getMusicDefaultLength() * number;
+}
+
 const generateABC = function() {
     let result = music.title + "\n";
     result += music.meter + "\n";
@@ -73,105 +169,9 @@ const generateABC = function() {
     return result;
 }
 
-// returns length of time of each measure as a number
-const getMeasureTime = function() {
-    const meter = music.meter.slice(2, music.meter.length);
-    if (meter === "C") return 1;
-    const numerator = meter.split("/")[0];
-    const denominator = meter.split("/")[1];
-    return +numerator / +denominator; // + is shorthand to convert string to number
-}
-
-// returns length of time of abc note string as number
-const getNoteTime = function(abcNote) {
-    let divide = false;
-    let number = "";
-    for (let i = 0; i < abcNote.length; i++) {
-        if (abcNote[i] === "/") divide = true;
-        if (!isNaN(abcNote[i])) number += abcNote[i];
-    }
-    number = +number;
-    // At this point, if number is not 0, we are returning a modification of the default note length.
-    if (number === 0) return getMusicDefaultLength();
-    if (divide) return getMusicDefaultLength() / number;
-    else return getMusicDefaultLength() * number;
-}
-
-// returns the default note length set in the music object
-const getMusicDefaultLength = function() {
-    const length = music.noteLength.slice(2, music.noteLength.length);
-    if (length.indexOf("/") < 0) return +length;
-    const numerator = length.split("/")[0];
-    const denominator = length.split("/")[1];
-    return +numerator / +denominator; // + is shorthand to convert string to number
-}
-
-// creates an array of individual abcjs notes from a staff
-const getStaffArray = function(topOrBot) {
-    /* Firstly, botOrTop is a boolean that determines if we're going to return an array of
-    the top staff for true, or the bottom staff for false. */
-    const staff = topOrBot ? music.staffTop : music.staffBot;
-    /* We're going to iterate over every character in the staff string, adding characters to
-    a temporary note string, and adding it to an array once it's complete (i.e. a new note 
-    string has started). */
-    const arr = [];
-    let note = "";
-    /* The only consistent element in every ABCjs note is a letter determining the pitch
-    class. But there can be an infinite number of pre and post letter modifiers. (Technically
-    there can be at most two pre modifiers, but I think it's easier to just assume infinite).
-    So we can't simply add the new note once we encounter one of the characters that signify 
-    the start of a new note. Those characters are: Letters, ^, and _. We can only add a note 
-    if a starting character has been encountered AND the temporary note has found a letter 
-    character. */
-    let hasLetter = false;
-    /* Before we begin the loop, we're going to get the note started with the first character.
-    If the first character is a letter, we need to set `hasLetter` to true so that if another
-    starting character is encountered, we can add note to the array and begin the process 
-    again.*/
-    note = music.staffTop[0];
-    hasLetter = isLetter(note);
-    // now for the loop
-    for (let i = 1; i < staff.length; i++) {
-        let c = staff[i];
-        // the logic is different if we've found a letter
-        if (hasLetter) {
-            /* In the case a letter has been found, we finish the note if the current
-            character is a starting character, continue as normal otherwise*/
-            if (isABCStart(c)) {
-                arr.push(note);
-                note = c;
-                hasLetter = isLetter(c);
-            } else note += c;
-        } else {
-            /* If a letter has not been found, we determine if the current character
-            is a letter, and add it regardless.*/
-            note += c;
-            hasLetter = isLetter(c);
-        }
-    }
-    arr.push(note); // add last note
-    return arr;
-}
-
-// Returns true if given character is one of the characters that could start an ABCjs note
-const isABCStart = function(char) {
-    return (isLetter(char) || char === "^" || char === "_");
-}
-
-// determine if input is a letter character
-const isLetter = function(letter) {
-    if (letter.length !== 1) return false;
-    /* The match function takes in a regex expression. It returns an array of elements in the 
-    string that match the expression. The expression below represents all letters. The function
-    returns null if no elements match. */
-    let match = letter.match(/[a-z]/i);
-    if (match === null) return false;
-    return true;
-}
-
-/* Since we're mostly just worried about piano data, the lowest midi note value 
-we'll recieve is 21 for A0, and the highest is 108 for C8*/
 const midiToABC = function(midi, useflats=false) {
+    /* Since we're mostly just worried about piano data, the lowest midi note value
+    we'll recieve is 21 for A0, and the highest is 108 for C8*/
     let note = "";
     // first we determine the pitch class
     let pClass = midi % 12;
