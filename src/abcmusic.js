@@ -9,42 +9,6 @@ const music = {
     measuresPerLine: 5
 }
 
-const pianoEX = `
-T:Piano Music
-M:C
-L:1/4
-K:A
-%%staves {1,2}
-V:1
-AAAA|FACA|ABCD|GFBD
-V:2
-[K:A clef=bass]
-G,,B,,D,,E,,|F,,A,,C,,A,,|A,,B,,C,,D,,|G,,F,,B,,D,,
-V:1
-[K:A clef=treble]
-GBDE|FACA|ABCD|GFBD
-V:2
-[K:A clef=bass]
-G,,B,,D,,E,,|F,,A,,C,,A,,|A,,B,,C,,D,,|G,,F,,B,,D,,
-`
-const testABC = `
-T:Piano Music
-M:C
-L:1/4
-K:A
-%%staves {1,2}
-V:2
-AAAAAAAAAAAAAAAA
-V:2
-K:B
-M:6/8
-CCCCCBBB
-V:2
-FFFFFFFFFFFFFFFF
-V:1
-BBBBBBBBBBBBBBBB
-`
-
 const generateABC = function() {
     let result = music.title + "\n";
     result += music.meter + "\n";
@@ -100,6 +64,7 @@ const generateABC = function() {
         // add final bar if line is final line (indices are at end)
         if (iTop === notesTop.length) lineTop += "]";
         if (iBot === notesBot.length) lineBot += "]";
+        // add lines
         result += headerTop;
         result += lineTop + "\n";
         result += headerBot;
@@ -329,6 +294,42 @@ const abcToMidi = function(abc) {
     // final midi value is the combined register, class, and accidental modifier
     return pClass + pReg + acc;
 }
+
+const pianoEX = `
+T:Piano Music
+M:C
+L:1/4
+K:A
+%%staves {1,2}
+V:1
+AAAA|FACA|ABCD|GFBD
+V:2
+[K:A clef=bass]
+G,,B,,D,,E,,|F,,A,,C,,A,,|A,,B,,C,,D,,|G,,F,,B,,D,,
+V:1
+[K:A clef=treble]
+GBDE|FACA|ABCD|GFBD
+V:2
+[K:A clef=bass]
+G,,B,,D,,E,,|F,,A,,C,,A,,|A,,B,,C,,D,,|G,,F,,B,,D,,
+`
+const testABC = `
+T:Piano Music
+M:C
+L:1/4
+K:A
+%%staves {1,2}
+V:2
+AAAAAAAAAAAAAAAA
+V:2
+K:B
+M:6/8
+CCCCCBBB
+V:2
+FFFFFFFFFFFFFFFF
+V:1
+BBBBBBBBBBBBBBBB
+`
 
 export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
 
