@@ -1,11 +1,12 @@
 const music = {
     title: "T:",
-    meter: "M:C",
+    meter: "M:12/8",
     noteLength: "L:1/4",
     key: "K:Eb",
     staffMarker: "%%staves {1,2}",
-    staffTop: "abcdefga",
-    staffBot: "G,B,DEF,A,C,A,"
+    staffTop: "abcd/2 e/2fga",
+    staffBot: "G,B,DEF,A,C,A,",
+    measuresPerLine: 5
 }
 
 const pianoEX = `
@@ -62,8 +63,12 @@ const generateABC = function() {
 
     I think the best way to handle line breaks is to copy the staff strings
     into new strings, and then slowly pick them apart, inserting measures 
-    where needed.
+    where needed. This means we need a way to A: determine the length in
+    time of a given abc note and B: determine the length of time of measures
+    given the M: tag in the header.
     */
+
+
 
     let tempTop = music.staffTop;
     let tempBot = music.staffBot;
@@ -76,6 +81,40 @@ const generateABC = function() {
     result += music.staffBot + "\n";
 
     return result;
+}
+
+// returns length of time of each measure as a number
+const getMeasureTime = function() {
+    const meter = music.meter.slice(2, music.meter.length);
+    if (meter === "C") return 1;
+    const numerator = meter.split("/")[0];
+    const denominator = meter.split("/")[1];
+    return +numerator / +denominator; // + is shorthand to convert string to number
+}
+
+// returns length of time of abc note string as number
+const getNoteTime = function(abcNote) {
+    let divide = false;
+    let number = "";
+    for (let i = 0; i < abcNote.length; i++) {
+        if (abcNote[i] === "/") divide = true;
+        if (!isNaN(abcNote[i])) number += abcNote[i];
+    }
+    number = +number;
+    /* At this point, if number is not 0, we are returning
+    a modification of the default note length */
+    if (number === 0) return getMusicDefaultLength();
+    if (divide) return getMusicDefaultLength() / number;
+    else return getMusicDefaultLength() * number;
+}
+
+// returns the default note length set in the music object
+const getMusicDefaultLength = function() {
+    const length = music.noteLength.slice(2, music.noteLength.length);
+    if (length.indexOf("/") < 0) return +length;
+    const numerator = length.split("/")[0];
+    const denominator = length.split("/")[1];
+    return +numerator / +denominator; // + is shorthand to convert string to number
 }
 
 /* Since we're mostly just worried about piano data, the lowest midi note value 
@@ -205,6 +244,11 @@ const abcToMidi = function(abc) {
 }
 
 export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
+
+// -------------------- TESTS --------------------
+
+console.log(getNoteTime("_A''3"));
+console.log(getMeasureTime());
 
 function test_abcToMidi(note, expected) {
     let midi = abcToMidi(note);
