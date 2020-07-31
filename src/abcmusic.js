@@ -97,7 +97,9 @@ const generateABC = function() {
             console.log("Measure created!");
             lineBot += "|";
         }
-        // add lines
+        // add final bar if line is final line (indices are at end)
+        if (iTop === notesTop.length) lineTop += "]";
+        if (iBot === notesBot.length) lineBot += "]";
         result += headerTop;
         result += lineTop + "\n";
         result += headerBot;
