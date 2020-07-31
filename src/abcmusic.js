@@ -118,18 +118,42 @@ const getMusicDefaultLength = function() {
 
 // creates an array of individual abcjs notes from the top staff
 const getStaffArrayTop = function() {
+    /* We're going to iterate over every character in the staff string, adding characters to
+    a temporary note string, and adding it to an array once it's complete (i.e. a new note 
+    string has started). */
     const arr = [];
-    let note = music.staffTop[0]; // start with first character already logged
-    
-    /* Notes in ABCjs may start with a flat/sharp/natural symbol, but then absolutely have a letter. 
-    Notes may end with just that letter, a number signifying length, and commas or single quotes for 
-    register changes. We need to iterate over each character, adding characters to a temporary
-    note string, and adding the next note when we are sure we've reach the beginning of a new note.*/
+    let note = "";
+    /* The only consistent element in every ABCjs note is a letter determining the pitch
+    class. But there can be an infinite number of pre and post letter modifiers. (Technically
+    there can be at most two pre modifiers, but I think it's easier to just assume infinite).
+    So we can't simply add the new note once we encounter one of the characters that signify 
+    the start of a new note. Those characters are: Letters, ^, and _. We can only add a note 
+    if a starting character has been encountered AND the temporary note has found a letter 
+    character. */
+    let hasLetter = false;
+    /* Before we begin the loop, we're going to get the note started with the first character.
+    If the first character is a letter, we need to set `hasLetter` to true so that if another
+    starting character is encountered, we can add note to the array and begin the process 
+    again.*/
+    note = music.staffTop[0];
+    hasLetter = isLetter(note);
+
+    // now for the loop
     for (let i = 1; i < music.staffTop.length; i++) {
-        
+        let c = music.staffTop[i];
+        // the logic is different if we've found a letter
+        if (hasLetter) {
+            /* In the case a letter has been found, we add the note if a starting character
+            is discovered. */
+        }
     }
-    arr.push(note);
+    arr.push(note); // add last note
     return arr;
+}
+
+// Returns true if given character is one of the characters that could start an ABCjs note
+const isABCStart = function(char) {
+    return (isLetter(char) || char === "^" || char === "_");
 }
 
 // determine if input is a letter character
@@ -273,7 +297,7 @@ export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
 
 // -------------------- TESTS --------------------
 
-console.log(isLetter("2"));
+console.log(isLetter("Z"));
 
 function test_abcToMidi(note, expected) {
     let midi = abcToMidi(note);
