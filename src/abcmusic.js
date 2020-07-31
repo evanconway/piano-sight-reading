@@ -101,8 +101,7 @@ const getNoteTime = function(abcNote) {
         if (!isNaN(abcNote[i])) number += abcNote[i];
     }
     number = +number;
-    /* At this point, if number is not 0, we are returning
-    a modification of the default note length */
+    // At this point, if number is not 0, we are returning a modification of the default note length.
     if (number === 0) return getMusicDefaultLength();
     if (divide) return getMusicDefaultLength() / number;
     else return getMusicDefaultLength() * number;
@@ -115,6 +114,26 @@ const getMusicDefaultLength = function() {
     const numerator = length.split("/")[0];
     const denominator = length.split("/")[1];
     return +numerator / +denominator; // + is shorthand to convert string to number
+}
+
+// creates an array of individual abcjs notes from the top staff
+const getStaffArrayTop = function() {
+    const arr = [];
+    let note = music.staffTop[0]; // start with first character already logged
+    
+    /* Notes in ABCjs may start with a flat/sharp/natural symbol, but then absolutely have a letter. 
+    Notes may end with just that letter, a number signifying length, and commas or single quotes for 
+    register changes. We need to iterate over each character, adding characters to a temporary
+    note string, and adding the next note when we are sure we've reach the beginning of a new note.*/
+    for (let i = 1; i < music.staffTop.length; i++) {
+        
+    }
+    arr.push(note);
+    return arr;
+}
+
+const isLetter = function(letter) {
+    return (letter === letter.match(/[a-z]/i)[0]);
 }
 
 /* Since we're mostly just worried about piano data, the lowest midi note value 
@@ -247,8 +266,7 @@ export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
 
 // -------------------- TESTS --------------------
 
-console.log(getNoteTime("_A''3"));
-console.log(getMeasureTime());
+console.log(isLetter("A"));
 
 function test_abcToMidi(note, expected) {
     let midi = abcToMidi(note);
