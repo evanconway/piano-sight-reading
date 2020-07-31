@@ -132,8 +132,15 @@ const getStaffArrayTop = function() {
     return arr;
 }
 
+// determine if input is a letter character
 const isLetter = function(letter) {
-    return (letter === letter.match(/[a-z]/i)[0]);
+    if (letter.length !== 1) return false;
+    /* The match function takes in a regex expression. It returns an array of elements in the 
+    string that match the expression. The expression below represents all letters. The function
+    returns null if no elements match. */
+    let match = letter.match(/[a-z]/i);
+    if (match === null) return false;
+    return true;
 }
 
 /* Since we're mostly just worried about piano data, the lowest midi note value 
@@ -266,7 +273,7 @@ export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
 
 // -------------------- TESTS --------------------
 
-console.log(isLetter("A"));
+console.log(isLetter("2"));
 
 function test_abcToMidi(note, expected) {
     let midi = abcToMidi(note);
