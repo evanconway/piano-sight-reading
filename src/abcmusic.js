@@ -4,7 +4,7 @@ const music = {
     noteLength: "L:1/4",
     key: "K:Eb",
     staffMarker: "%%staves {1,2}",
-    staffTop: "abcd/2 e/2fga",
+    staffTop: "A'B/2,,_GF__ED^C",
     staffBot: "G,B,DEF,A,C,A,",
     measuresPerLine: 5
 }
@@ -68,11 +68,8 @@ const generateABC = function() {
     given the M: tag in the header.
     */
 
-
-
     let tempTop = music.staffTop;
     let tempBot = music.staffBot;
-
 
     result += "V:1\n";
     result += music.staffTop + "\n";
@@ -116,8 +113,11 @@ const getMusicDefaultLength = function() {
     return +numerator / +denominator; // + is shorthand to convert string to number
 }
 
-// creates an array of individual abcjs notes from the top staff
-const getStaffArrayTop = function() {
+// creates an array of individual abcjs notes from a staff
+const getStaffArray = function(topOrBot) {
+    /* Firstly, botOrTop is a boolean that determines if we're going to return an array of
+    the top staff for true, or the bottom staff for false. */
+    const staff = topOrBot ? music.staffTop : music.staffBot;
     /* We're going to iterate over every character in the staff string, adding characters to
     a temporary note string, and adding it to an array once it's complete (i.e. a new note 
     string has started). */
@@ -137,14 +137,23 @@ const getStaffArrayTop = function() {
     again.*/
     note = music.staffTop[0];
     hasLetter = isLetter(note);
-
     // now for the loop
-    for (let i = 1; i < music.staffTop.length; i++) {
-        let c = music.staffTop[i];
+    for (let i = 1; i < staff.length; i++) {
+        let c = staff[i];
         // the logic is different if we've found a letter
         if (hasLetter) {
-            /* In the case a letter has been found, we add the note if a starting character
-            is discovered. */
+            /* In the case a letter has been found, we finish the note if the current
+            character is a starting character, continue as normal otherwise*/
+            if (isABCStart(c)) {
+                arr.push(note);
+                note = c;
+                hasLetter = isLetter(c);
+            } else note += c;
+        } else {
+            /* If a letter has not been found, we determine if the current character
+            is a letter, and add it regardless.*/
+            note += c;
+            hasLetter = isLetter(c);
         }
     }
     arr.push(note); // add last note
@@ -297,7 +306,8 @@ export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
 
 // -------------------- TESTS --------------------
 
-console.log(isLetter("Z"));
+console.log(getStaffArray(true));
+console.log(getStaffArray(false));
 
 function test_abcToMidi(note, expected) {
     let midi = abcToMidi(note);
