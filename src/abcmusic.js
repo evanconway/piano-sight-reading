@@ -4,8 +4,8 @@ const music = {
     noteLength: "L:1/4",
     key: "K:Eb",
     staffMarker: "%%staves {1,2}",
-    staffTop: "A'B,,_GF__ED^CB''ABEGDBFGEBAGFBDGEBAGFBDGEBAGFBDGEBFGABDGEBFGABDGEBFGDBCF",
-    staffBot: "G,B,DEF,A,C,A,ABGFBDGEBGFBAGDBFGEBGABDGFBGEBFGDBAGDBBFGDBAGDBFGEBFGFBE",
+    staffTop: "(2ABDFEDADFGBE",
+    staffBot: "BGFEDAFDFAFG",
     measuresPerLine: 5
 }
 
@@ -47,7 +47,7 @@ const getStaffArray = function (topOrBot) {
     If the first character is a letter, we need to set `hasLetter` to true so that if another
     starting character is encountered, we can add note to the array and begin the process 
     again.*/
-    note = music.staffTop[0];
+    note = staff[0];
     hasLetter = isLetter(note);
     // now for the loop
     for (let i = 1; i < staff.length; i++) {
