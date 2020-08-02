@@ -9,13 +9,13 @@ const music = {
     measuresPerLine: 5
 }
 
-// determine if input is a musical letter character
+// determine if input is a letter character
 const isLetter = function(letter) {
     if (letter.length !== 1) return false;
     /* The match function takes in a regex expression. It returns an array of elements in the 
     string that match the expression. The expression below represents all letters. The function
     returns null if no elements match. */
-    let match = letter.match(/[a-g]/i);
+    let match = letter.match(/[a-z]/i);
     if (match === null) return false;
     return true;
 }
@@ -25,13 +25,14 @@ const isABCStart = function(char) {
     return (isLetter(char) || char === "^" || char === "_");
 }
 
-// Returns true if given char is part of a single ABC note
+// Returns true if given char is part of a single ABC note, this function may have been pointless...
 const isABCNotePart = function (char) {
     let result = false;
     if (isABCStart(char)) result = true;
     if (char === "," || char === "'") result = true;
     return result;
 }
+
 // creates an array of individual abcjs notes from a staff
 const getStaffArray = function(topOrBot) {
     /* Firstly, botOrTop is a boolean that determines if we're going to return an array of
@@ -50,6 +51,15 @@ const getStaffArray = function(topOrBot) {
     if a starting character has been encountered AND the temporary note has found a letter 
     character. */
     let hasLetter = false;
+
+    /* Before continuing, we should make notes about triplets, duples, etc... The current
+    implementation splits up the staff string into individual notes, but finding time
+    for individual notes doesn't work with ABCjs triplet notation. This is because triplets
+    use syntax at the start of the group of notes, but the rest of the notes are notated
+    like normal. For now, we're going to ignore triplets. But when we add them, we'll 
+    likely have to calculate triplets all at once, or modify our getTime function to 
+    require a parameter indicating it's part of a triplet or something. */
+
     // now for the loop
     for (let i = 0; i < staff.length; i++) {
         let c = staff[i];
