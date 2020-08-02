@@ -4,29 +4,36 @@ const music = {
     noteLength: "L:1/4",
     key: "K:Eb",
     staffMarker: "%%staves {1,2}",
-    staffTop: "(2ABDFEDADFGBE",
+    staffTop: "(3ABDFEDADFGBE",
     staffBot: "BGFEDAFDFAFG",
     measuresPerLine: 5
 }
 
-// determine if input is a letter character
-const isLetter = function (letter) {
+// determine if input is a musical letter character
+const isLetter = function(letter) {
     if (letter.length !== 1) return false;
     /* The match function takes in a regex expression. It returns an array of elements in the 
     string that match the expression. The expression below represents all letters. The function
     returns null if no elements match. */
-    let match = letter.match(/[a-z]/i);
+    let match = letter.match(/[a-g]/i);
     if (match === null) return false;
     return true;
 }
 
 // Returns true if given character is one of the characters that could start an ABCjs note
-const isABCStart = function (char) {
+const isABCStart = function(char) {
     return (isLetter(char) || char === "^" || char === "_");
 }
 
+// Returns true if given char is part of a single ABC note
+const isABCNotePart = function (char) {
+    let result = false;
+    if (isABCStart(char)) result = true;
+    if (char === "," || char === "'") result = true;
+    return result;
+}
 // creates an array of individual abcjs notes from a staff
-const getStaffArray = function (topOrBot) {
+const getStaffArray = function(topOrBot) {
     /* Firstly, botOrTop is a boolean that determines if we're going to return an array of
     the top staff for true, or the bottom staff for false. */
     const staff = topOrBot ? music.staffTop : music.staffBot;
@@ -43,14 +50,8 @@ const getStaffArray = function (topOrBot) {
     if a starting character has been encountered AND the temporary note has found a letter 
     character. */
     let hasLetter = false;
-    /* Before we begin the loop, we're going to get the note started with the first character.
-    If the first character is a letter, we need to set `hasLetter` to true so that if another
-    starting character is encountered, we can add note to the array and begin the process 
-    again.*/
-    note = staff[0];
-    hasLetter = isLetter(note);
     // now for the loop
-    for (let i = 1; i < staff.length; i++) {
+    for (let i = 0; i < staff.length; i++) {
         let c = staff[i];
         // the logic is different if we've found a letter
         if (hasLetter) {
@@ -73,7 +74,7 @@ const getStaffArray = function (topOrBot) {
 }
 
 // returns length of time of each measure as a number
-const getMeasureTime = function () {
+const getMeasureTime = function() {
     const meter = music.meter.slice(2, music.meter.length);
     if (meter === "C") return 1;
     const numerator = meter.split("/")[0];
@@ -82,7 +83,7 @@ const getMeasureTime = function () {
 }
 
 // returns the default note length set in the music object
-const getMusicDefaultLength = function () {
+const getMusicDefaultLength = function() {
     const length = music.noteLength.slice(2, music.noteLength.length);
     if (length.indexOf("/") < 0) return +length;
     const numerator = length.split("/")[0];
@@ -91,7 +92,7 @@ const getMusicDefaultLength = function () {
 }
 
 // returns length of time of abc note string as number
-const getNoteTime = function (abcNote) {
+const getNoteTime = function(abcNote) {
     let divide = false;
     let number = "";
     for (let i = 0; i < abcNote.length; i++) {
