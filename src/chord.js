@@ -85,12 +85,12 @@ const keyUsesSharps = function(key) {
     if (key === "A") result = true;
     if (key === "E") result = true;
     if (key === "B") result = true;
-    if (key[1] === "#") result = true;
+    if (key.length > 1 && key[1] === "#") result = true;
     return result;
 }
 
 const keyUsesFlats = function(key) {
-    return (key === "F" || key[1] === "b");
+    return (key === "F" || (key.length > 1 && key[1] === "b"));
 }
 
 class Chord { 
@@ -104,7 +104,12 @@ class Chord {
     }
 
     getABCString(key) {
-        
+        let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
+        if (this.pitches.length === 0) return null; // maybe we could use length 0 to represent rests??
+        if (this.pitches.length === 1) return midiToABC(useflats) + this.length;
+        result = "[";
+        this.pitches.forEach(e => result += e);
+        return result + "]" + this.length;
     }
 }
 
