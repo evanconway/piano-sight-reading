@@ -38,7 +38,11 @@ const ABC_MUSIC = abcjs.renderAbc("abc-paper", generateABC(), {
   }
 });
 
-const paths = document.querySelectorAll("path");
+const notesTop = document.querySelectorAll("div svg path.abcjs-note.abcjs-v0");
+const notesBot = document.querySelectorAll("div svg path.abcjs-note.abcjs-v1");
+console.log("here are the notes...");
+console.log(notesTop);
+console.log(notesBot);
 
 /* TODO
 Define music object
