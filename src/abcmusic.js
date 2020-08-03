@@ -1,12 +1,16 @@
+import {Chord} from "./chord";
+
+const defaultLength = 4;
+
 const music = {
     title: "T:",
     meter: "M:C",
-    noteLength: "L:1/4",
+    noteLength: `L:1/${defaultLength}`,
     key: "K:Eb",
     staffMarker: "%%staves {1,2}",
-    staffTop: "(3ABDFEDADFGBE",
+    staffTop: "ABDGDFEDADFG",
     staffBot: "BGFEDAFDFAFG",
-    measuresPerLine: 5
+    measuresPerLine: 3
 }
 
 // determine if input is a letter character
