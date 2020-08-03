@@ -90,26 +90,27 @@ class Chord {
         let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
         if (this.pitches.length === 0) return null; // maybe we could use length 0 to represent rests??
         if (this.pitches.length === 1) return midiToABC(this.pitches[0], useflats) + this.duration.toString();
-        result = "[";
+        let result = "[";
         this.pitches.forEach(e => result += midiToABC(e, useflats));
-        return result + "]" + this.length;
+        result += "]" + this.duration.toString();
+        return result;
     }
 }
 
-const m = 1;
-const noteNum = 36;
-const testCArrTop = [];
-for (let i = 0; i < noteNum; i++) {
-    let c = new Chord(m);
-    c.addPitch(60 + Math.floor(20 * Math.random()));
-    testCArrTop.push(c);
+const generateTest = function (topOrBot = true, numOfPitches = 1) {
+    const m = 1;
+    const noteNum = 48;
+    const arr = [];
+    for (let i = 0; i < noteNum; i++) {
+        let c = new Chord(m);
+        let pitchMod = Math.floor(20 * Math.random());
+        for (let j = 0; j < numOfPitches; j++) {
+            if (topOrBot) c.addPitch(60 + pitchMod);
+            else c.addPitch(60 - pitchMod);
+        }
+        arr.push(c);
+    }
+    return arr;
 }
 
-const testCArrBot = [];
-for (let i = 0; i < noteNum; i++) {
-    let c = new Chord(m);
-    c.addPitch(60 - Math.floor(20 * Math.random()));
-    testCArrBot.push(c);
-}
-
-export { midiToABC, Chord, testCArrTop, testCArrBot }
+export { midiToABC, Chord, generateTest}
