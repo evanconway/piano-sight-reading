@@ -1,14 +1,14 @@
 import {midiToABC, Chord, testCArrTop, testCArrBot} from "./chord";
 
-const defaultLength = 4;
-const defaultKey = "Eb";
+const DEFAULT_DURATION = 4;
+const DEFAULT_KEY = "Bb";
+const STAFF_MARKER = "%%staves {1,2}";
 
 const music = {
-    title: "T:",
-    meter: "M:C",
-    noteLength: `L:1/${defaultLength}`,
-    key: `K:${defaultKey}`,
-    staffMarker: "%%staves {1,2}",
+    title: "",
+    meter: "C",
+    noteLength: DEFAULT_DURATION,
+    key: DEFAULT_KEY,
     staffTop: "ABDGDFEDADFG",
     staffBot: "BGFEDAFDFAFG",
     measuresPerLine: 3
@@ -122,10 +122,10 @@ const getNoteTime = function(abcNote) {
 }
 
 const generateABC = function() {
-    let result = music.title + "\n";
-    result += music.meter + "\n";
-    result += music.noteLength + "\n";
-    result += music.key + "\n";
+    let result = `T:${music.title}\n`;
+    result += `M:${music.meter}\n`;
+    result += `L:1/${music.noteLength}\n`;
+    result += `K:${music.key}\n`;
     /* The staff marker is syntax that declares 2 staves that we can write
     notation to. After experimenting, it looks like writing `V:` lets us
     declare which staff we're writing to. The default cleff of a staff is
@@ -134,7 +134,7 @@ const generateABC = function() {
     should be [K:A clef=bass]. Since we have to do this for each new line,
     I think it makes the most sense to just redeclare both staves after 
     each line break. */
-    result += music.staffMarker + "\n";
+    result += STAFF_MARKER + "\n";
     const headerTop = `V:1\n[K:${music.key} clef=treble]\n`;
     const headerBot = `V:2\n[K:${music.key} clef=bass]\n`;
     /* Now comes line generation. Our data is stored as an array of chord objects.
@@ -156,8 +156,8 @@ const generateABC = function() {
         for (let m = 0; m < music.measuresPerLine && iTop < notesTop.length; m++) {
             /* This inner loop is for generating a measure. Like line generation, we will 
             stop if the index reaches the end of the array. */
-            for (let time = 0; time < defaultLength && iTop < notesTop.length; iTop++) {
-                lineTop += notesTop[iTop].getABCString(defaultKey);
+            for (let time = 0; time < DEFAULT_DURATION && iTop < notesTop.length; iTop++) {
+                lineTop += notesTop[iTop].getABCString(DEFAULT_KEY);
                 time += notesTop[iTop].duration;
             }
             lineTop += "|";
@@ -165,8 +165,8 @@ const generateABC = function() {
         // generate bottom line, same logic as top
         let lineBot = "";
         for (let m = 0; m < music.measuresPerLine && iBot < notesBot.length; m++) {
-            for (let time = 0; time < defaultLength && iBot < notesBot.length; iBot++) {
-                lineBot += notesBot[iBot].getABCString(defaultKey);
+            for (let time = 0; time < DEFAULT_DURATION && iBot < notesBot.length; iBot++) {
+                lineBot += notesBot[iBot].getABCString(DEFAULT_KEY);
                 time += notesBot[iBot].duration;
             }
             lineBot += "|";

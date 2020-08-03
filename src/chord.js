@@ -76,23 +76,6 @@ const midiToABC = function (midi = 60, useflats = false) {
     return note;
 }
 
-// returns true if given key signature uses sharps
-const keyUsesSharps = function(key) {
-    result = false;
-    if (key === "C") result = true; // not sure about chromatic randomness
-    if (key === "G") result = true;
-    if (key === "D") result = true;
-    if (key === "A") result = true;
-    if (key === "E") result = true;
-    if (key === "B") result = true;
-    if (key.length > 1 && key[1] === "#") result = true;
-    return result;
-}
-
-const keyUsesFlats = function(key) {
-    return (key === "F" || (key.length > 1 && key[1] === "b"));
-}
-
 class Chord { 
     constructor(duration) {
         this.pitches = []; // pitches are midi pitch values, not ABCjs strings.
@@ -114,15 +97,16 @@ class Chord {
 }
 
 const m = 1;
+const noteNum = 36;
 const testCArrTop = [];
-for (let i = 0; i < 24; i++) {
+for (let i = 0; i < noteNum; i++) {
     let c = new Chord(m);
     c.addPitch(60 + Math.floor(20 * Math.random()));
     testCArrTop.push(c);
 }
 
 const testCArrBot = [];
-for (let i = 0; i < 24; i++) {
+for (let i = 0; i < noteNum; i++) {
     let c = new Chord(m);
     c.addPitch(60 - Math.floor(20 * Math.random()));
     testCArrBot.push(c);
