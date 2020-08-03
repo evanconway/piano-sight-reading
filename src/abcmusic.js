@@ -1,12 +1,38 @@
 import {midiToABC, Chord, generateTest} from "./chord";
 
+// music consts
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
 const TITLE = "Sight Reading";
 const METER = "C";
 const KEY = "Bb";
 const NOTES_TOP = generateTest(true);
 const NOTES_BOT = generateTest(false);
-const MEASURES_PER_LINE = 3;
+const MEASURES_PER_LINE = 4;
+const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
+
+let playCursor = 0;
+const COLOR_SELECT = "#00CC00";
+const COLOR_DEF = "#000000";
+
+// sets play cursor to given index
+const cursorSet = function(timeIndex) {
+    // the index here is for the timing array
+    playCursor = timeIndex;
+    NOTES_TOP.forEach(e => {
+        if (e.timingIndex === playCursor) e.path.setAttribute("fill", COLOR_SELECT);
+        else e.path.setAttribute("fill", COLOR_DEF);
+    });
+    NOTES_BOT.forEach(e => {
+        if (e.timingIndex === playCursor) e.path.setAttribute("fill", COLOR_SELECT);
+        else e.path.setAttribute("fill", COLOR_DEF);
+    });
+}
+
+// move cursor forward to next valid set of notes
+const CursorAdv = function() {
+    playCursor++;
+    
+}
 
 const generateABC = function () {
     let result = `T:${TITLE}\n`;
@@ -129,23 +155,26 @@ const assignPaths = function(notesTop = [], notesBot = []) {
 
 // returns array of array of midi values
 const generateMidiTimingArr = function() {
+
+    // just in case, we clear the timing array first, apparently this is a good way to do that
+    MIDI_TIMING_ARRAY.length = 0;
+
     /* The array that this function returns represents the notes from staffTop
     and staffBot as midi values and their timing. The midi values are straight
     forward. Each element in the array is itself an array of midi integers 
     representing pitch. The position of these values in the array represents
     when that note starts in time. Each array slot represents a music time value
     of 1/DEFAULT_DURATION. For now, we are not tracking the end of notes. */
-    const timingArr = [];
     let index = 0;
     // top staff first
     NOTES_TOP.forEach(e => {
-        for (let i = 0; i < e.duration; i++) timingArr.push(null); // add correct "duration"
+        for (let i = 0; i < e.duration; i++) MIDI_TIMING_ARRAY.push(null); // add correct "duration"
         e.timingIndex = index;
-        timingArr[index] = [];
-        e.pitches.forEach(pitch => timingArr[index].push(pitch));
-        index = timingArr.length;
+        MIDI_TIMING_ARRAY[index] = [];
+        e.pitches.forEach(pitch => MIDI_TIMING_ARRAY[index].push(pitch));
+        index = MIDI_TIMING_ARRAY.length;
     });
-    /* Now the bottom staff. Note that this loop will not add values to the timingArr.
+    /* Now the bottom staff. Note that this loop will not add values to the MIDI_TIMING_ARRAY.
     It will only add pitches to existing slots. We are assuming that staffTop and 
     staffBot are the exact same musical length. If they are not, this function will
     break. We'll just have to be careful and ensure our music generation functions
@@ -153,11 +182,11 @@ const generateMidiTimingArr = function() {
     index = 0;
     NOTES_BOT.forEach(e => {
         e.timingIndex = index;
-        if (timingArr[index] === null) timingArr[index] = [];
-        e.pitches.forEach(pitch => timingArr[index].push(pitch));
+        if (MIDI_TIMING_ARRAY[index] === null) MIDI_TIMING_ARRAY[index] = [];
+        e.pitches.forEach(pitch => MIDI_TIMING_ARRAY[index].push(pitch));
         index += e.duration;
     })
-    return timingArr
+    return MIDI_TIMING_ARRAY
 }
 
 const abcToMidi = function(abc) {
@@ -208,7 +237,7 @@ const abcToMidi = function(abc) {
     return pClass + pReg + acc;
 }
 
-export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr }
+export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr, cursorSet, CursorAdv}
 
 // -------------------- TESTS --------------------
 

@@ -105,7 +105,7 @@ class Chord {
 }
 
 const generateTest = function (topOrBot = true, numOfPitches = 1, duration = 12) {
-    const noteNum = 2 * 16 / (duration / 12);
+    const noteNum = 5 * 16 / (duration / 12);
     const arr = [];
     for (let i = 0; i < noteNum; i++) {
         let c = new Chord(duration);

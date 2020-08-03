@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import {generateABC, generateABCOneLine, midiToABC, assignPaths, generateMidiTimingArr, abcToMidi} from "./abcmusic"
+import {generateABC, generateABCOneLine, midiToABC, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet} from "./abcmusic"
 
 const pianoEX = `
 T:Piano Music
@@ -62,20 +62,10 @@ https://paulrosen.github.io/abcjs/visual/render-abc-options.html
 The renderAbc function accepts an object filled with options for abcjs. 
 It's important to understand why we've chosen the options we have...  
 if we decide to use them */
-let useABCWrap = false;
-if (useABCWrap) {
-  abcjs.renderAbc("abc-paper", generateABCOneLine(), { 
-    add_classes: true, // puts abcjs classes in the html
-    staffwidth: 900, // maximum staff/line length
-    wrap: { // line wrap rules
-      preferredMeasuresPerLine: 4
-    }
-  });
-} else {
-  abcjs.renderAbc("abc-paper", generateABC(), {
-    add_classes: true
-  })
-}
+abcjs.renderAbc("abc-paper", generateABC(), {
+  add_classes: true
+})
+
 const notesTop = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v0"));
 const notesBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v1"));
 assignPaths(notesTop, notesBot);
@@ -84,7 +74,7 @@ console.log(notesTop);
 console.log("Bot Note Paths");
 console.log(notesBot);
 console.log(generateMidiTimingArr());
-
+cursorSet(0);
 /* TODO
 Define music object
 need function to translate it to regular ABC string
