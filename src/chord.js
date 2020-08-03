@@ -80,6 +80,7 @@ class Chord {
     constructor(duration) {
         this.pitches = []; // pitches are midi pitch values, not ABCjs strings.
         this.duration = duration; // the ABC modifier for the default length
+        this.path = null; // reference to the html element of the note
     }
 
     addPitch(pitch) {
@@ -95,6 +96,10 @@ class Chord {
         result += "]" + this.duration.toString();
         return result;
     }
+
+    setPath(path) {
+        this.path = path;
+    }
 }
 
 const generateTest = function (topOrBot = true, numOfPitches = 1) {
@@ -103,8 +108,8 @@ const generateTest = function (topOrBot = true, numOfPitches = 1) {
     const arr = [];
     for (let i = 0; i < noteNum; i++) {
         let c = new Chord(m);
-        let pitchMod = Math.floor(20 * Math.random());
         for (let j = 0; j < numOfPitches; j++) {
+            let pitchMod = Math.floor(20 * Math.random());
             if (topOrBot) c.addPitch(60 + pitchMod);
             else c.addPitch(60 - pitchMod);
         }

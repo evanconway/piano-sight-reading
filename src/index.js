@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import {generateABC, midiToABC, testABC} from "./abcmusic"
+import {MUSIC, generateABC, midiToABC, assignPaths} from "./abcmusic"
 
 function add_msg_handlers(controllers) {
   for (let input of controllers) {
@@ -38,11 +38,10 @@ const ABC_MUSIC = abcjs.renderAbc("abc-paper", generateABC(), {
   }
 });
 
-const notesTop = document.querySelectorAll("div svg path.abcjs-note.abcjs-v0");
-const notesBot = document.querySelectorAll("div svg path.abcjs-note.abcjs-v1");
-console.log("here are the notes...");
-console.log(notesTop);
-console.log(notesBot);
+const notesTop = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v0"));
+const notesBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v1"));
+assignPaths(notesTop, notesBot);
+console.log(MUSIC);
 
 /* TODO
 Define music object
