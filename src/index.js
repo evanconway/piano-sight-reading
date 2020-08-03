@@ -26,8 +26,19 @@ navigator.requestMIDIAccess()
   .then(onfullfilled)
   .catch(err => console.log(err));
 
-const ABC_MUSIC = abcjs.renderAbc("abc-paper", generateABC());
-console.log(ABC_MUSIC);
+/* I'm going to link the documentation right here: 
+https://paulrosen.github.io/abcjs/visual/render-abc-options.html
+The renderAbc function accepts an object filled with options for abcjs. 
+It's important to understand why we've chosen the options we have.  */
+const ABC_MUSIC = abcjs.renderAbc("abc-paper", generateABC(), { 
+  add_classes: true, // puts abcjs classes in the html
+  staffwidth: 800, // maximum staff/line length
+  wrap: { // line wrap rules
+    preferredMeasuresPerLine: 4
+  }
+});
+
+const paths = document.querySelectorAll("path");
 
 /* TODO
 Define music object

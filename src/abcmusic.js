@@ -14,65 +14,52 @@ const music = {
     staffBot: generateTest(false)
 }
 
-const generateABC = function() {
+// this function is identical to the one above, but it does not insert line breaks.
+const generateABC = function () {
     let result = `T:${music.title}\n`;
     result += `M:${music.meter}\n`;
     result += `L:1/${music.noteLength}\n`;
     result += `K:${music.key}\n`;
-    /* The staff marker is syntax that declares 2 staves that we can write
-    notation to. After experimenting, it looks like writing `V:` lets us
-    declare which staff we're writing to. The default cleff of a staff is
-    treble, and we can change this with clef=bass inside of []. But it
-    also appears we have to set the key again as well. So the full line
-    should be [K:A clef=bass]. Since we have to do this for each new line,
-    I think it makes the most sense to just redeclare both staves after 
-    each line break. */
     result += STAFF_MARKER + "\n";
     const headerTop = `V:1\n[K:${music.key} clef=treble]\n`;
     const headerBot = `V:2\n[K:${music.key} clef=bass]\n`;
-    /* Now comes line generation. Our data is stored as an array of chord objects.
-    These objects already convenient data like length of notes, and string generation
-    functions. */
     const notesTop = music.staffTop;
     const notesBot = music.staffBot;
-    /* We're going to iterate over these two arrays, creating lines and measures
-    from them. Lines are determined by number of measures. Measures are determined
-    by chord length and meter. Using two separate indices, one for each array,
-    we'll create lines unil all notes in both arrays have been iterated through. */
-    let iTop = 0;
-    let iBot = 0;
-    while (iTop < notesTop.length && iBot < notesBot.length) {
-        // generate top line
-        let lineTop = "";
-        /* This outer loop is for generating the correct number of measures. Observe
-        that we stop if the index reaches the end of the notes array*/
-        for (let m = 0; m < music.measuresPerLine && iTop < notesTop.length; m++) {
-            /* This inner loop is for generating a measure. Like line generation, we will 
-            stop if the index reaches the end of the array. */
-            for (let time = 0; time < DEFAULT_DURATION && iTop < notesTop.length; iTop++) {
-                lineTop += notesTop[iTop].getABCString(DEFAULT_KEY);
-                time += notesTop[iTop].duration;
-            }
+
+    // generate top line
+    let lineTop = "";
+    for (let i = 0, time = 0; i < notesTop.length; i++) {
+        lineTop += notesTop[i].getABCString(DEFAULT_KEY); // recall that elements of notesTop are chord objects
+        time += notesTop[i].duration;
+        if (time >= DEFAULT_DURATION) {
             lineTop += "|";
+            time = 0;
         }
-        // generate bottom line, same logic as top
-        let lineBot = "";
-        for (let m = 0; m < music.measuresPerLine && iBot < notesBot.length; m++) {
-            for (let time = 0; time < DEFAULT_DURATION && iBot < notesBot.length; iBot++) {
-                lineBot += notesBot[iBot].getABCString(DEFAULT_KEY);
-                time += notesBot[iBot].duration;
-            }
-            lineBot += "|";
-        }
-        // add final bar if line is final line (indices are at end)
-        if (iTop === notesTop.length) lineTop += "]";
-        if (iBot === notesBot.length) lineBot += "]";
-        // add lines
-        result += headerTop;
-        result += lineTop + "\n";
-        result += headerBot;
-        result += lineBot + "\n";
     }
+    if (lineTop[lineTop.length - 1] !== "|") lineTop += "|"; // ensure measure at end
+
+    // same logic for bottom line
+    let lineBot = "";
+    for (let i = 0, time = 0; i < notesBot.length; i++) {
+        lineBot += notesBot[i].getABCString(DEFAULT_KEY);
+        time += notesBot[i].duration;
+        if (time >= DEFAULT_DURATION) {
+            lineBot += "|";
+            time = 0;
+        }
+    }
+    if (lineBot[lineBot.length - 1] !== "|") lineBot += "|"; // ensure measure at end
+
+    // add final bar lines
+    lineTop += "]";
+    lineBot += "]";
+
+    // add lines
+    result += headerTop;
+    result += lineTop + "\n";
+    result += headerBot;
+    result += lineBot + "\n";
+    
     console.log(result);
     return result;
 }
