@@ -1,4 +1,4 @@
-const midiToABC = function (midi, useflats = false) {
+const midiToABC = function (midi = 60, useflats = false) {
     /* Since we're mostly just worried about piano data, the lowest midi note value
     we'll recieve is 21 for A0, and the highest is 108 for C8*/
     let note = "";
@@ -94,9 +94,9 @@ const keyUsesFlats = function(key) {
 }
 
 class Chord { 
-    constructor(length) {
+    constructor(duration) {
         this.pitches = []; // pitches are midi pitch values, not ABCjs strings.
-        this.length = length;
+        this.duration = duration; // the ABC modifier for the default length
     }
 
     addPitch(pitch) {
@@ -106,23 +106,24 @@ class Chord {
     getABCString(key) {
         let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
         if (this.pitches.length === 0) return null; // maybe we could use length 0 to represent rests??
-        if (this.pitches.length === 1) return midiToABC(useflats) + this.length;
+        if (this.pitches.length === 1) return midiToABC(this.pitches[0], useflats) + this.duration.toString();
         result = "[";
-        this.pitches.forEach(e => result += e);
+        this.pitches.forEach(e => result += midiToABC(e, useflats));
         return result + "]" + this.length;
     }
 }
 
+const m = 1;
 const testCArrTop = [];
 for (let i = 0; i < 24; i++) {
-    let c = new Chord(12);
+    let c = new Chord(m);
     c.addPitch(60 + Math.floor(20 * Math.random()));
     testCArrTop.push(c);
 }
 
 const testCArrBot = [];
 for (let i = 0; i < 24; i++) {
-    let c = new Chord(12);
+    let c = new Chord(m);
     c.addPitch(60 - Math.floor(20 * Math.random()));
     testCArrBot.push(c);
 }

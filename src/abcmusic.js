@@ -1,14 +1,13 @@
 import {midiToABC, Chord, testCArrTop, testCArrBot} from "./chord";
 
-console.log(testCArrTop, testCArrBot);
-
 const defaultLength = 4;
+const defaultKey = "Eb";
 
 const music = {
     title: "T:",
     meter: "M:C",
     noteLength: `L:1/${defaultLength}`,
-    key: "K:Eb",
+    key: `K:${defaultKey}`,
     staffMarker: "%%staves {1,2}",
     staffTop: "ABDGDFEDADFG",
     staffBot: "BGFEDAFDFAFG",
@@ -138,14 +137,14 @@ const generateABC = function() {
     result += music.staffMarker + "\n";
     const headerTop = `V:1\n[K:${music.key} clef=treble]\n`;
     const headerBot = `V:2\n[K:${music.key} clef=bass]\n`;
-    /* Now comes line generation. First, we're not going to reference the staff
-    strings themselves, we'll be using our array functions so we can easily refer
-    to individual notes. */
-    const notesTop = getStaffArray(true);
-    const notesBot = getStaffArray(false);
+    /* Now comes line generation. Our data is stored as an array of chord objects.
+    These objects already convenient data like length of notes, and string generation
+    functions. */
+    const notesTop = testCArrTop;
+    const notesBot = testCArrBot;
     /* We're going to iterate over these two arrays, creating lines and measures
     from them. Lines are determined by number of measures. Measures are determined
-    by note length and meter. Using two separate indices, one for each staff/array,
+    by chord length and meter. Using two separate indices, one for each array,
     we'll create lines unil all notes in both arrays have been iterated through. */
     let iTop = 0;
     let iBot = 0;
@@ -157,21 +156,19 @@ const generateABC = function() {
         for (let m = 0; m < music.measuresPerLine && iTop < notesTop.length; m++) {
             /* This inner loop is for generating a measure. Like line generation, we will 
             stop if the index reaches the end of the array. */
-            for (let time = 0; time < getMeasureTime() && iTop < notesTop.length; iTop++) {
-                lineTop += notesTop[iTop];
-                time += getNoteTime(notesTop[iTop]);
+            for (let time = 0; time < defaultLength && iTop < notesTop.length; iTop++) {
+                lineTop += notesTop[iTop].getABCString(defaultKey);
+                time += notesTop[iTop].duration;
             }
             lineTop += "|";
         }
         // generate bottom line, same logic as top
         let lineBot = "";
         for (let m = 0; m < music.measuresPerLine && iBot < notesBot.length; m++) {
-            for (let time = 0; time < getMeasureTime() && iBot < notesBot.length; iBot++) {
-                console.log(`Notes bot at ${iBot} is ${notesBot[iBot]}`);
-                lineBot += notesBot[iBot];
-                time += getNoteTime(notesBot[iBot]);
+            for (let time = 0; time < defaultLength && iBot < notesBot.length; iBot++) {
+                lineBot += notesBot[iBot].getABCString(defaultKey);
+                time += notesBot[iBot].duration;
             }
-            console.log("Measure created!");
             lineBot += "|";
         }
         // add final bar if line is final line (indices are at end)
@@ -183,6 +180,7 @@ const generateABC = function() {
         result += headerBot;
         result += lineBot + "\n";
     }
+    console.log(result);
     return result;
 }
 
@@ -273,9 +271,6 @@ BBBBBBBBBBBBBBBB
 export { testABC, pianoEX, music, midiToABC, abcToMidi, generateABC }
 
 // -------------------- TESTS --------------------
-
-console.log(getStaffArray(true));
-console.log(getStaffArray(false));
 
 function test_abcToMidi(note, expected) {
     let midi = abcToMidi(note);
