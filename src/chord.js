@@ -79,8 +79,14 @@ const midiToABC = function (midi = 60, useflats = false) {
 class Chord { 
     constructor(duration) {
         this.pitches = []; // pitches are midi pitch values, not ABCjs strings.
+        /* We should elaborate on duration here. Duration is actually a multiplier
+        of DEFAULT_DURATION in the abcjs file. Recall that DEFAULT_DURATION is 
+        actually the denominator of our default note length in abcjs. So if our
+        DEFAULT_DURATION is 48, a quarter note should have a duration of 12, and
+        eighth note a duration of 6, and a whole note a duration of 48. */
         this.duration = duration; // the ABC modifier for the default length
         this.path = null; // reference to the html element of the note
+        this.timingIndex = null; // index this note exists in the timing array
     }
 
     addPitch(pitch) {
@@ -96,18 +102,13 @@ class Chord {
         result += "]" + this.duration.toString();
         return result;
     }
-
-    setPath(path) {
-        this.path = path;
-    }
 }
 
-const generateTest = function (topOrBot = true, numOfPitches = 1) {
-    const m = 1;
-    const noteNum = 4 * 16;
+const generateTest = function (topOrBot = true, numOfPitches = 1, duration = 12) {
+    const noteNum = 2 * 16 / (duration / 12);
     const arr = [];
     for (let i = 0; i < noteNum; i++) {
-        let c = new Chord(m);
+        let c = new Chord(duration);
         for (let j = 0; j < numOfPitches; j++) {
             let pitchMod = Math.floor(20 * Math.random());
             if (topOrBot) c.addPitch(60 + pitchMod);
