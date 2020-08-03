@@ -9,7 +9,9 @@ const music = {
     meter: "C",
     noteLength: DEFAULT_DURATION,
     key: DEFAULT_KEY,
-    measuresPerLine: 3
+    measuresPerLine: 3,
+    staffTop: generateTest(),
+    staffBot: generateTest(false)
 }
 
 const generateABC = function() {
@@ -31,8 +33,8 @@ const generateABC = function() {
     /* Now comes line generation. Our data is stored as an array of chord objects.
     These objects already convenient data like length of notes, and string generation
     functions. */
-    const notesTop = generateTest();
-    const notesBot = generateTest(false);
+    const notesTop = music.staffTop;
+    const notesBot = music.staffBot;
     /* We're going to iterate over these two arrays, creating lines and measures
     from them. Lines are determined by number of measures. Measures are determined
     by chord length and meter. Using two separate indices, one for each array,
@@ -75,8 +77,8 @@ const generateABC = function() {
     return result;
 }
 
-const getMidiTiming = function() {
-    
+const generateMidiTimingArr = function() {
+
 }
 
 const abcToMidi = function(abc) {

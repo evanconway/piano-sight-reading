@@ -99,7 +99,7 @@ class Chord {
 
 const generateTest = function (topOrBot = true, numOfPitches = 1) {
     const m = 1;
-    const noteNum = 48;
+    const noteNum = 12 * 5;
     const arr = [];
     for (let i = 0; i < noteNum; i++) {
         let c = new Chord(m);
