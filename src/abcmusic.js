@@ -6,7 +6,7 @@ const TITLE = "Sight Reading";
 const METER = "C";
 const KEY = "Bb";
 const NOTES_TOP = generateTest(true);
-const NOTES_BOT = generateTest(false, 2, 24);
+const NOTES_BOT = generateTest(false, 1, 24);
 const MEASURES_PER_LINE = 4;
 const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 
@@ -26,6 +26,19 @@ const cursorSet = function(timeIndex) {
         if (e.timingIndex === playCursor) e.path.setAttribute("fill", COLOR_SELECT);
         else e.path.setAttribute("fill", COLOR_DEF);
     });
+}
+
+// returns true if given array of midi is equal to midi in timing array at play cursor
+const playedCorrect = function(midiArr = []) {
+    if (MIDI_TIMING_ARRAY[playCursor] === null) return false;
+    if (midiArr.length !== MIDI_TIMING_ARRAY[playCursor].length) return false;
+    
+    // note that the order of the elements does not have to be the same
+    let result = true;
+    midiArr.forEach(e => {
+        if (!MIDI_TIMING_ARRAY[playCursor].includes(e)) result = false;
+    })
+    return result;
 }
 
 // move cursor forward to next valid set of notes
@@ -249,7 +262,7 @@ const abcToMidi = function(abc) {
     return pClass + pReg + acc;
 }
 
-export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck}
+export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }
 
 // -------------------- TESTS --------------------
 
