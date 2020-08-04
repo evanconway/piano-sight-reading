@@ -6,12 +6,12 @@ const TITLE = "Sight Reading";
 const METER = "C";
 const KEY = "Bb";
 const NOTES_TOP = generateTest(true);
-const NOTES_BOT = generateTest(false);
+const NOTES_BOT = generateTest(false, 2, 24);
 const MEASURES_PER_LINE = 4;
 const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 
 let playCursor = 0;
-const COLOR_SELECT = "#00CC00";
+const COLOR_SELECT = "#00AA00";
 const COLOR_DEF = "#000000";
 
 // sets play cursor to given index
@@ -29,9 +29,19 @@ const cursorSet = function(timeIndex) {
 }
 
 // move cursor forward to next valid set of notes
-const CursorAdv = function() {
+const cursorAdv = function() {
     playCursor++;
-    
+    while (MIDI_TIMING_ARRAY[playCursor] === null && playCursor < MIDI_TIMING_ARRAY.length) playCursor++;
+    if (playCursor === MIDI_TIMING_ARRAY.length) playCursor = 0;
+    cursorSet(playCursor);
+}
+
+// move cursor backward to previous valid set of notes
+const cursorBck = function () {
+    playCursor--;
+    while (MIDI_TIMING_ARRAY[playCursor] === null && playCursor >= 0) playCursor--;
+    if (playCursor < 0) playCursor = 0;
+    cursorSet(playCursor);
 }
 
 const generateABC = function () {
@@ -85,7 +95,7 @@ const generateABC = function () {
         }
         // add final bar if line is final line (indices are at end)
         if (iTop === NOTES_TOP.length) lineTop += "]";
-        if (iBot === NOTES_TOP.length) lineBot += "]";
+        if (iBot === NOTES_BOT.length) lineBot += "]";
         // add lines
         result += headerTop;
         result += lineTop + "\n";
@@ -93,6 +103,8 @@ const generateABC = function () {
         result += lineBot + "\n";
     }
     console.log(result);
+    console.log("iTop is " + iTop);
+    console.log("iBot is " + iBot);
     return result;
 }
 
@@ -237,7 +249,7 @@ const abcToMidi = function(abc) {
     return pClass + pReg + acc;
 }
 
-export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr, cursorSet, CursorAdv}
+export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck}
 
 // -------------------- TESTS --------------------
 

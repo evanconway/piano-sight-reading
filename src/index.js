@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import {generateABC, generateABCOneLine, midiToABC, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet} from "./abcmusic"
+import {generateABC, generateABCOneLine, midiToABC, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet, cursorAdv, cursorBck} from "./abcmusic"
 
 const pianoEX = `
 T:Piano Music
@@ -75,6 +75,13 @@ console.log("Bot Note Paths");
 console.log(notesBot);
 console.log(generateMidiTimingArr());
 cursorSet(0);
+cursorAdv();
+
+document.addEventListener('keydown', e => {
+  if (e.code === "ArrowRight") cursorAdv();
+  if (e.code === "ArrowLeft") cursorBck();
+});
+
 /* TODO
 Define music object
 need function to translate it to regular ABC string
