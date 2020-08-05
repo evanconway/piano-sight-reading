@@ -1,4 +1,5 @@
-const midiToABC = function (midi = 60, useflats = false) {
+const midiToABC = function (midi = 60, key = "C") {
+    let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
     /* Since we're mostly just worried about piano data, the lowest midi note value
     we'll recieve is 21 for A0, and the highest is 108 for C8*/
     let note = "";
@@ -94,25 +95,71 @@ class Chord {
     }
 
     getABCString(key) {
-        let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
         if (this.pitches.length === 0) return null; // maybe we could use length 0 to represent rests??
-        if (this.pitches.length === 1) return midiToABC(this.pitches[0], useflats) + this.duration.toString();
+        if (this.pitches.length === 1) return midiToABC(this.pitches[0], key) + this.duration.toString();
         let result = "[";
-        this.pitches.forEach(e => result += midiToABC(e, useflats));
+        this.pitches.forEach(e => result += midiToABC(e, key));
         result += "]" + this.duration.toString();
         return result;
     }
 }
 
-const generateTest = function (topOrBot = true, numOfPitches = 1, duration = 12) {
+// returns a random midi note in the given key.
+const generateNote = function(key, min, max) {
+    /* Some notes about midi pitches: Each octave is divided into 12 pitches. They can be thought
+    of as starting at the C 5 octaves below middle C. This means that middle C is the value 60. 
+    We will think of our pitch classes in terms of the bottom octave, so C is 0, D is 2, E is 4,
+    and so on. This allows us to create our pitches by adding/subtracting octaves and the pitch
+    class from 60, middle C. This works well for us because abcjs uses the middle C octave as the
+    default location for pitches. Check the ABCjs documentation for syntax for key signatures. We 
+    are going to assign the valid pitch classes manually. */
+
+    let pitchClassOptions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]; // the default if given key is not valid
+    if (key === "C" || key === "Am") pitchClassOptions = [0, 2, 4, 5, 7, 9, 11];
+    if (key === "G" || key === "Em") pitchClassOptions = [0, 2, 4, 6, 7, 9, 11];
+    if (key === "D" || key === "Bm") pitchClassOptions = [1, 2, 4, 6, 7, 9, 11];
+    if (key === "A" || key === "F#m") pitchClassOptions = [1, 2, 4, 6, 8, 9, 11];
+    if (key === "E" || key === "C#m") pitchClassOptions = [1, 3, 4, 6, 8, 9, 11];
+    if (key === "B" || key === "G#m") pitchClassOptions = [1, 3, 4, 6, 8, 10, 11];
+    if (key === "F#" || key === "D#m") pitchClassOptions = [1, 3, 5, 6, 8, 10, 11];
+    if (key === "C#" || key === "A#m") pitchClassOptions = [0, 1, 3, 5, 6, 8, 10];
+    if (key === "F" || key === "Dm") pitchClassOptions = [0, 2, 4, 5, 7, 9, 10];
+    if (key === "Bb" || key === "Gm") pitchClassOptions = [0, 2, 3, 5, 7, 9, 10];
+    if (key === "Eb" || key === "Cm") pitchClassOptions = [0, 2, 3, 5, 7, 8, 10];
+    if (key === "Ab" || key === "Fm") pitchClassOptions = [0, 1, 3, 5, 7, 8, 10];
+    if (key === "Db" || key === "Bbm") pitchClassOptions = [0, 1, 3, 5, 6, 8, 10];
+    if (key === "Gb" || key === "Ebm") pitchClassOptions = [1, 3, 5, 6, 8, 10, 11];
+    if (key === "Cb" || key === "Abm") pitchClassOptions = [1, 3, 4, 6, 8, 10, 11];
+
+    /* After determining what pitches are possible in the given key, we create an array of all
+    pitches from the key between the min and max, inclusive. The reason i starts at 1 and ends
+    at 9 is because this ensures we include notes 1 octave beyond the range of the piano in 
+    either direction. That way we don't miss the top C or the bottom 3 extension notes. */
+    const possiblePitches = [];
+    for (let i = 1; i < 10; i++) {
+        for (let j = 0; j < pitchClassOptions.length; j++) {
+            let pitch = pitchClassOptions[j] + i * 12;
+            if (pitch >= min && pitch <= max) possiblePitches.push(pitch);
+            if (pitch > max) {
+                i = 10;
+                j = pitchClassOptions.length;
+            }
+        }
+    }
+
+    // choose a random index from this array, and return the value
+    let rIndex = Math.floor(Math.random() * possiblePitches.length);
+    return possiblePitches[rIndex];
+}
+
+const generateTest = function (key, topOrBot = true, numOfPitches = 1, duration = 12) {
     const noteNum = 5 * 16 / (duration / 12);
     const arr = [];
     for (let i = 0; i < noteNum; i++) {
         let c = new Chord(duration);
         for (let j = 0; j < numOfPitches; j++) {
-            let pitchMod = Math.floor(20 * Math.random());
-            if (topOrBot) c.addPitch(60 + pitchMod);
-            else c.addPitch(60 - pitchMod);
+            if (topOrBot) c.addPitch(generateNote(key, 60, 80));
+            else c.addPitch(generateNote(key, 40, 60));
         }
         arr.push(c);
     }
