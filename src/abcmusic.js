@@ -4,7 +4,7 @@ import {midiToABC, Chord, generateTest} from "./chord";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
 const TITLE = "Sight Reading";
 const METER = "C";
-const KEY = "A";
+const KEY = "C#";
 const NOTES_TOP = generateTest(KEY, true);
 const NOTES_BOT = generateTest(KEY, false, 1, 24);
 const MEASURES_PER_LINE = 4;
@@ -121,53 +121,6 @@ const generateABC = function () {
     return result;
 }
 
-// this function is identical to the one above, but it does not insert line breaks.
-const generateABCOneLine = function () {
-    let result = "";
-    result += `M:${METER}\n`;
-    result += `L:1/${BASE_DURATION}\n`;
-    result += `T:${TITLE}\n`;
-    result += `%%staves {1 2}\n`;
-    result += `V:1 clef=treble\n`;
-    result += `V:2 clef=bass\n`;
-    result += `K:${KEY}\n`;
-
-    // generate top line
-    let lineTop = "";
-    for (let i = 0, time = 0; i < NOTES_TOP.length; i++) {
-        lineTop += NOTES_TOP[i].getABCString(KEY); // recall that elements of notesTop are chord objects
-        time += NOTES_TOP[i].duration;
-        if (time >= BASE_DURATION) {
-            lineTop += "|";
-            time = 0;
-        }
-    }
-    if (lineTop[lineTop.length - 1] !== "|") lineTop += "|"; // ensure measure at end
-
-    // same logic for bottom line
-    let lineBot = "";
-    for (let i = 0, time = 0; i < NOTES_BOT.length; i++) {
-        lineBot += NOTES_BOT[i].getABCString(KEY);
-        time += NOTES_BOT[i].duration;
-        if (time >= BASE_DURATION) {
-            lineBot += "|";
-            time = 0;
-        }
-    }
-    if (lineBot[lineBot.length - 1] !== "|") lineBot += "|"; // ensure measure at end
-
-    // add final bar lines
-    lineTop += "]";
-    lineBot += "]";
-
-    // add lines
-    result += `[V:1] ` + lineTop + "\n";
-    result += `[V:2] ` + lineBot + "\n";
-    
-    console.log(result);
-    return result;
-}
-
 // assigns elements from array of path tags to the staffTop and staffBot chords
 const assignPaths = function(notesTop = [], notesBot = []) {
     /* Note that this function assumes a lot of things. It assumes that when
@@ -262,7 +215,7 @@ const abcToMidi = function(abc) {
     return pClass + pReg + acc;
 }
 
-export { midiToABC, abcToMidi, generateABCOneLine, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }
+export { midiToABC, abcToMidi, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }
 
 // -------------------- TESTS --------------------
 

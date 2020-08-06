@@ -59,22 +59,21 @@ abcjs.renderAbc("abc-paper", generateABC(), {
 	add_classes: true
 })
 
+/* We need to be able to refer to the html to change the color of notes. We do that
+with query selectors. The generateABC function does more than create strings. It also
+creates music objects that represent the music. The assign paths function gives
+these objects references to their own html elements. */
 const notesTop = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v0"));
 const notesBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v1"));
 assignPaths(notesTop, notesBot);
-console.log(generateMidiTimingArr());
+
+// the timing array is how we keep track of where the user is in the music
+generateMidiTimingArr();
+
+// set cursor at the beginning
 cursorSet(0);
+
 document.addEventListener('keydown', e => {
 	if (e.code === "ArrowRight") cursorAdv();
 	if (e.code === "ArrowLeft") cursorBck();
 });
-
-/* TODO
-Define music object
-need function to translate it to regular ABC string
-midi to abc function (relative to key?)
-key signature note normalization (ex: no sharp if note already sharp in key)
-score manipulation functions
-measure counting and insertion
-line breaks
-*/

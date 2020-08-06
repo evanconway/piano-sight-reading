@@ -1,10 +1,9 @@
 const midiToABC = function (midi = 60, key = "C") {
     let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
-    /* Since we're mostly just worried about piano data, the lowest midi note value
-    we'll recieve is 21 for A0, and the highest is 108 for C8*/
+    
     let note = "";
-    // first we determine the pitch class
-    let pClass = midi % 12;
+    let pClass = midi % 12; // short of pitch class
+
     switch (pClass) {
         case 0:
             note = "C";
