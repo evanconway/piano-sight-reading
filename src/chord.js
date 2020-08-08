@@ -1,3 +1,5 @@
+import { KEY_SIGNATURES } from "./keysigs"
+
 const midiToABC = function (midi = 60, key = "C") {
     let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
     

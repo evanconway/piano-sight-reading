@@ -4,7 +4,7 @@ import {midiToABC, Chord, generateTest} from "./chord";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
 const TITLE = "Sight Reading";
 const METER = "C";
-const KEY = "C#";
+const KEY = "A";
 const NOTES_TOP = generateTest(KEY, true);
 const NOTES_BOT = generateTest(KEY, false, 1, 24);
 const MEASURES_PER_LINE = 4;

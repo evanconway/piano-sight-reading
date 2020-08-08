@@ -68,7 +68,7 @@ const notesBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.a
 assignPaths(notesTop, notesBot);
 
 // the timing array is how we keep track of where the user is in the music
-generateMidiTimingArr();
+console.log(generateMidiTimingArr());
 
 // set cursor at the beginning
 cursorSet(0);
