@@ -22,7 +22,6 @@ const notePlayed = function(midi) {
 }
 
 const noteReleased = function(midi) {
-	//console.log(`Note Off ${midiToABC(midi)}`);
 	playDel(midi);
 }
 
@@ -35,15 +34,12 @@ function add_msg_handlers(controllers) {
 			} 
 		}
 	}
-	console.log("Done")
 }
 
 function onfullfilled(midiaccess, options) {
-	console.log(midiaccess);
 	let controllers = midiaccess.inputs.values()
-	console.log(controllers);
 	add_msg_handlers(controllers);
-	midiaccess.onstatechange = (_) => add_msg_handlers(controllers);
+	midiaccess.onstatechange = () => add_msg_handlers(controllers);
 }
 
 navigator.requestMIDIAccess()
@@ -68,7 +64,7 @@ const notesBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.a
 assignPaths(notesTop, notesBot);
 
 // the timing array is how we keep track of where the user is in the music
-console.log(generateMidiTimingArr());
+generateMidiTimingArr();
 
 // set cursor at the beginning
 cursorSet(0);

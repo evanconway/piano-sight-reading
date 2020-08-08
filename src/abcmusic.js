@@ -115,9 +115,6 @@ const generateABC = function () {
         result += headerBot;
         result += lineBot + "\n";
     }
-    console.log(result);
-    console.log("iTop is " + iTop);
-    console.log("iBot is " + iBot);
     return result;
 }
 
@@ -216,48 +213,3 @@ const abcToMidi = function(abc) {
 }
 
 export { midiToABC, abcToMidi, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }
-
-// -------------------- TESTS --------------------
-
-function test_abcToMidi(note, expected) {
-    let midi = abcToMidi(note);
-    if (midi != expected) {
-        console.log(`Error, got ${note} and expected ${expected} but returned ${midi}`)
-    } else {
-        console.log(`test passed`)
-    }
-}
-
-test_abcToMidi('C', 60);
-test_abcToMidi('D', 62);
-test_abcToMidi('_C', 59);
-test_abcToMidi('^C', 61);
-test_abcToMidi("^C'", 73);
-test_abcToMidi("^C,", 49);
-test_abcToMidi("_D,", 49);
-
-function test_midiToABC(midi, expected, useflats=false) {
-    let note = midiToABC(midi, useflats);
-    if (note != expected) {
-        console.log(`Error, got ${midi} and expected ${expected} but returned ${note}`)
-    } else {
-        console.log(`test passed`)
-    }
-}
-
-test_midiToABC(60, 'C');
-test_midiToABC(62, 'D');
-test_midiToABC(58, '_B');
-test_midiToABC(61, '^C');
-test_midiToABC(73, "^C'");
-test_midiToABC(49, "^C,");
-test_midiToABC(49, "_D,", true);
-
-
-const get_key_sig_normalizer = (sig) => (note) => {
-    if (note in sig) {
-        return note.slice(1)
-    } else {
-        note
-    }
-}
