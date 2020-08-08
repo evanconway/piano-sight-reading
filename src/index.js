@@ -51,7 +51,7 @@ https://paulrosen.github.io/abcjs/visual/render-abc-options.html
 The renderAbc function accepts an object filled with options for abcjs. 
 It's important to understand why we've chosen the options we have...  
 if we decide to use them */
-abcjs.renderAbc("abc-paper", generateABC(), {
+abcjs.renderAbc("score", generateABC(), {
 	add_classes: true
 })
 
