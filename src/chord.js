@@ -78,6 +78,25 @@ const midiToABC = function (midi = 60, key = "C") {
     return note;
 }
 
+class Pitch {
+    constructor(key, scaleDegree, register) {
+        this.key = key;
+        this.scaleDegree = scaleDegree;
+
+        /* The midi value stored in the key signatures map is only the correct
+        pitch class. We now need to get the correct midi value using the given
+        register*/
+        this.midi = KEY_SIGNATURES.get(key)[1];
+        for (let i = 0; i < register; i++) this.midi += 12;
+
+        /* Similar to the midi value, we have to create the correct ABCjs string
+        using the given register. */
+        this.string = KEY_SIGNATURES.get(key)[0];
+        if (register < 4) for (let i = 4; i > register; i--) this.string += ",";
+        else for (let i = 4; i < register; i++) this.string += "'";
+    }
+}
+
 class Chord { 
     constructor(duration) {
         this.pitches = []; // pitches are midi pitch values, not ABCjs strings.
