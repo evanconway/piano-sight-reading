@@ -9,6 +9,13 @@ module.exports = {
   },
   module: {  // where we defined file patterns and their loaders
       rules: [ 
+        {
+          test: /\.css$/,
+          use: [
+            'style-loader',
+            'css-loader'
+          ]
+        }
       ]
   },
   plugins: [  // Array of plugins to apply to build chunk

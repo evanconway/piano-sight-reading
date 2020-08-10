@@ -1,3 +1,4 @@
+import "./styles.css";
 import abcjs from "abcjs";
 import {generateABC, generateABCOneLine, midiToABC, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet, cursorAdv, cursorBck, playedCorrect} from "./abcmusic"
 
