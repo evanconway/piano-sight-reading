@@ -5,8 +5,8 @@ const BASE_DURATION = 48; // this is actually the denominator of the default tim
 const TITLE = "Sight Reading";
 const METER = "C";
 const KEY = "Dm";
-const NOTES_TOP = generateTest(KEY, true);
-const NOTES_BOT = generateTest(KEY, false, 1, 24);
+let NOTES_TOP = [];
+let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
 const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 
@@ -42,11 +42,17 @@ const playedCorrect = function(midiArr = []) {
 }
 
 // move cursor forward to next valid set of notes
+// returns true if cursor was advanced, false if it couldn't (at end)
 const cursorAdv = function() {
+    let result = true;
     playCursor++;
     while (MIDI_TIMING_ARRAY[playCursor] === null && playCursor < MIDI_TIMING_ARRAY.length) playCursor++;
-    if (playCursor === MIDI_TIMING_ARRAY.length) playCursor = 0;
+    if (playCursor === MIDI_TIMING_ARRAY.length) {
+        playCursor = 0;
+        result = false;
+    }
     cursorSet(playCursor);
+    return result;
 }
 
 // move cursor backward to previous valid set of notes
@@ -58,6 +64,10 @@ const cursorBck = function () {
 }
 
 const generateABC = function () {
+
+    NOTES_TOP = generateTest(KEY, true);
+    NOTES_BOT = generateTest(KEY, false, 1, 24);
+
     let result = `T:${TITLE}\n`;
     result += `M:${METER}\n`;
     result += `L:1/${BASE_DURATION}\n`;
@@ -161,7 +171,6 @@ const generateMidiTimingArr = function() {
         e.pitches.forEach(pitch => MIDI_TIMING_ARRAY[index].push(pitch.midi));
         index += e.duration;
     })
-    console.log(MIDI_TIMING_ARRAY);
     return MIDI_TIMING_ARRAY
 }
 
