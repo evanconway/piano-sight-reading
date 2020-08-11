@@ -4,7 +4,7 @@ import {Chord, generateTest} from "./chord";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
 const TITLE = "Sight Reading";
 const METER = "C";
-let KEY = "Dm";
+let KEY = "C";
 let NOTES_TOP = [];
 let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;

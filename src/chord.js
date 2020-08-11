@@ -1,5 +1,13 @@
 import { KEY_SIGNATURES } from "./keysigs"
 
+// add all key signatures to key signature drop down
+let options = ""
+KEY_SIGNATURES.forEach((val, key) => {
+    options += `<option value="${key}">${key}</option>`;
+})
+const KEY_MENU = document.querySelector("select");
+KEY_MENU.innerHTML = options;
+
 const midiToABC = function (midi = 60, key = "C") {
     let useflats = (key === "F" || (key.length > 1 && key[1] === "b"));
     
