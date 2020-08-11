@@ -1,10 +1,10 @@
-import {midiToABC, Chord, generateTest} from "./chord";
+import {Chord, generateTest} from "./chord";
 
 // music consts
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
 const TITLE = "Sight Reading";
 const METER = "C";
-const KEY = "Dm";
+let KEY = "Dm";
 let NOTES_TOP = [];
 let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
@@ -63,7 +63,9 @@ const cursorBck = function () {
     cursorSet(playCursor);
 }
 
-const generateABC = function () {
+const generateABC = function (key) {
+
+    if (key) KEY = key;
 
     NOTES_TOP = generateTest(KEY, true);
     NOTES_BOT = generateTest(KEY, false, 1, 24);
@@ -222,4 +224,4 @@ const abcToMidi = function(abc) {
     return pClass + pReg + acc;
 }
 
-export { midiToABC, abcToMidi, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }
+export { abcToMidi, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }

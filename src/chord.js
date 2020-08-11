@@ -145,4 +145,4 @@ const generateTest = function (key, topOrBot = true, numOfPitches = 1, duration 
     return arr;
 }
 
-export { midiToABC, Chord, generateTest}
+export { Chord, generateTest}

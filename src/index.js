@@ -1,6 +1,6 @@
 import "./styles.css";
 import abcjs from "abcjs";
-import {generateABC, generateABCOneLine, midiToABC, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet, cursorAdv, cursorBck, playedCorrect} from "./abcmusic"
+import {generateABC, generateABCOneLine, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet, cursorAdv, cursorBck, playedCorrect} from "./abcmusic"
 
 // this is the array where we will keep track of what notes the user is playing
 const MIDI_PLAYED = [];
@@ -44,13 +44,13 @@ function onfullfilled(midiaccess, options) {
 	midiaccess.onstatechange = () => add_msg_handlers(controllers);
 }
 
-const makeMusic = function() {
+const makeMusic = function(key) {
 	/* I'm going to link the documentation right here: 
 	https://paulrosen.github.io/abcjs/visual/render-abc-options.html
 	The renderAbc function accepts an object filled with options for abcjs. 
 	It's important to understand why we've chosen the options we have...  
 	if we decide to use them */
-	abcjs.renderAbc("score", generateABC(), {
+	abcjs.renderAbc("score", generateABC(key), {
 		add_classes: true
 	})
 
@@ -78,5 +78,10 @@ document.addEventListener('keydown', e => {
 	if (e.code === "ArrowRight") cursorAdv();
 	if (e.code === "ArrowLeft") cursorBck();
 });
+
+const MENU_KEY = document.querySelector("select");
+MENU_KEY.addEventListener("change", e => {
+	makeMusic(MENU_KEY.value)
+})
 
 makeMusic();
