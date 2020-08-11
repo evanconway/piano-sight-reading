@@ -1,6 +1,5 @@
 import "./styles.css";
-import abcjs from "abcjs";
-import {generateABC, generateABCOneLine, assignPaths, generateMidiTimingArr, abcToMidi, cursorSet, cursorAdv, cursorBck, playedCorrect} from "./abcmusic"
+import { cursorAdv, cursorBck, playedCorrect, makeMusic} from "./abcmusic"
 
 // this is the array where we will keep track of what notes the user is playing
 const MIDI_PLAYED = [];
@@ -23,16 +22,12 @@ const notePlayed = function(midi) {
 	}
 }
 
-const noteReleased = function(midi) {
-	playDel(midi);
-}
-
 function add_msg_handlers(controllers) {
 	for (let input of controllers) {
 		input.onmidimessage = (msg) => {
 			if (msg.data[0] === 144) {
 				if (msg.data[2] > 0) notePlayed(msg.data[1]);
-				else noteReleased(msg.data[1]);
+				else playDel(msg.data[1]);
 			} 
 		}
 	}
@@ -42,31 +37,6 @@ function onfullfilled(midiaccess, options) {
 	let controllers = midiaccess.inputs.values()
 	add_msg_handlers(controllers);
 	midiaccess.onstatechange = () => add_msg_handlers(controllers);
-}
-
-const makeMusic = function(key) {
-	/* I'm going to link the documentation right here: 
-	https://paulrosen.github.io/abcjs/visual/render-abc-options.html
-	The renderAbc function accepts an object filled with options for abcjs. 
-	It's important to understand why we've chosen the options we have...  
-	if we decide to use them */
-	abcjs.renderAbc("score", generateABC(key), {
-		add_classes: true
-	})
-
-	/* We need to be able to refer to the html to change the color of notes. We do that
-	with query selectors. The generateABC function does more than create strings. It also
-	creates music objects that represent the music. The assign paths function gives
-	these objects references to their own html elements. */
-	let notesTop = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v0"));
-	let notesBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v1"));
-	assignPaths(notesTop, notesBot);
-
-	// the timing array is how we keep track of where the user is in the music
-	generateMidiTimingArr();
-
-	// set cursor at the beginning
-	cursorSet(0);
 }
 
 navigator.requestMIDIAccess()
@@ -79,9 +49,8 @@ document.addEventListener('keydown', e => {
 	if (e.code === "ArrowLeft") cursorBck();
 });
 
-const MENU_KEY = document.querySelector("select");
-MENU_KEY.addEventListener("change", e => {
-	makeMusic(MENU_KEY.value)
+document.querySelector("select").addEventListener("change", e => {
+	makeMusic(e.target.value)
 })
 
 makeMusic();

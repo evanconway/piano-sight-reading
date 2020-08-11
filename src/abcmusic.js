@@ -1,18 +1,20 @@
+import abcjs from "abcjs";
 import {Chord, generateTest} from "./chord";
 
-// music consts
+const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
+const COLOR_SELECT = "#00AA00";
+const COLOR_DEF = "#000000";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
+
+// music consts
 const TITLE = "Sight Reading";
 const METER = "C";
 let KEY = "C";
 let NOTES_TOP = [];
 let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
-const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 
 let playCursor = 0;
-const COLOR_SELECT = "#00AA00";
-const COLOR_DEF = "#000000";
 
 // sets play cursor to given index
 const cursorSet = function(timeIndex) {
@@ -63,9 +65,7 @@ const cursorBck = function () {
     cursorSet(playCursor);
 }
 
-const generateABC = function (key) {
-
-    if (key) KEY = key;
+const generateABC = function () {
 
     NOTES_TOP = generateTest(KEY, true);
     NOTES_BOT = generateTest(KEY, false, 1, 24);
@@ -176,52 +176,32 @@ const generateMidiTimingArr = function() {
     return MIDI_TIMING_ARRAY
 }
 
-const abcToMidi = function(abc) {
-    // recall that `abc` is a string for ABCjs code
+const makeMusic = function (key) {
 
-    // determine accidental
-    let acc = 0;
-    if (abc[0] === '^') acc = 1;
-    if (abc[0] === '_') acc = -1;
+    if (key) KEY = key;
 
-    // determine "letter" of pitch
-    let pitchL = (acc) ? abc[1] : abc[0];
+	/* I'm going to link the documentation right here: 
+	https://paulrosen.github.io/abcjs/visual/render-abc-options.html
+	The renderAbc function accepts an object filled with options for abcjs. 
+	It's important to understand why we've chosen the options we have...  
+	if we decide to use them */
+    abcjs.renderAbc("score", generateABC(), {
+        add_classes: true
+    })
 
-    // use pitchL to determine register
-    let pReg = 60; // 60 is the default register
-    for (let i = abc.length - 1; abc[i] !== pitchL; i--) {
-        if (abc[i] === "'") pReg += 12;
-        if (abc[i] === ",") pReg -= 12;
-    }
+	/* We need to be able to refer to the html to change the color of notes. We do that
+	with query selectors. The generateABC function does more than create strings. It also
+	creates music objects that represent the music. The assign paths function gives
+	these objects references to their own html elements. */
+    let pathsTop = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v0"));
+    let pathsBot = Array.from(document.querySelectorAll("div svg path.abcjs-note.abcjs-v1"));
+    assignPaths(pathsTop, pathsBot);
 
-    // determine int value of the pitch class
-    let pClass = 0;
-    switch (pitchL) {
-        case "C":
-            pClass = 0;
-            break;
-        case "D":
-            pClass = 2;
-            break;
-        case "E":
-            pClass = 4;
-            break;
-        case "F":
-            pClass = 5;
-            break;
-        case "G":
-            pClass = 7;
-            break;
-        case "A":
-            pClass = 9;
-            break;
-        case "B":
-            pClass = 11;
-            break;
-    }
+    // the timing array is how we keep track of where the user is in the music
+    generateMidiTimingArr();
 
-    // final midi value is the combined register, class, and accidental modifier
-    return pClass + pReg + acc;
+    // set cursor at the beginning
+    cursorSet(0);
 }
 
-export { abcToMidi, generateABC, assignPaths, generateMidiTimingArr, cursorSet, cursorAdv, cursorBck, playedCorrect }
+export { cursorAdv, cursorBck, playedCorrect, makeMusic }
