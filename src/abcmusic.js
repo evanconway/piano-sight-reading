@@ -13,6 +13,8 @@ let KEY = "C";
 let NOTES_TOP = [];
 let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
+let DURATION_TOP = 12;
+let DURATION_BOT = 24;
 
 let playCursor = 0;
 
@@ -67,8 +69,8 @@ const cursorBck = function () {
 
 const generateABC = function () {
 
-    NOTES_TOP = generateTest(KEY, true);
-    NOTES_BOT = generateTest(KEY, false, 1, 24);
+    NOTES_TOP = generateTest(KEY, true, 1, DURATION_TOP);
+    NOTES_BOT = generateTest(KEY, false, 1, DURATION_BOT);
 
     let result = `T:${TITLE}\n`;
     result += `M:${METER}\n`;
@@ -102,19 +104,31 @@ const generateABC = function () {
         that we stop if the index reaches the end of the notes array*/
         for (let m = 0; m < MEASURES_PER_LINE && iTop < NOTES_TOP.length; m++) {
             /* This inner loop is for generating a measure. Like line generation, we will 
-            stop if the index reaches the end of the array. */
-            for (let time = 0; time < BASE_DURATION && iTop < NOTES_TOP.length; iTop++) {
+            stop if the index reaches the end of the array. Here, we also keep track of 
+            note time so we can break beams correctly if the note value is small enough */
+
+            for (let time_m = 0, time_b = 0; time_m < BASE_DURATION && iTop < NOTES_TOP.length; iTop++) {
                 lineTop += NOTES_TOP[iTop].getABCString(KEY);
-                time += NOTES_TOP[iTop].duration;
+                time_m += NOTES_TOP[iTop].duration;
+                time_b += NOTES_TOP[iTop].duration;
+                if (time_b >= BASE_DURATION / 4) { // shouldn't be 4, should be variable
+                    time_b = 0;
+                    lineTop += " ";
+                }
             }
             lineTop += "|";
         }
         // generate bottom line, same logic as top
         let lineBot = "";
         for (let m = 0; m < MEASURES_PER_LINE && iBot < NOTES_BOT.length; m++) {
-            for (let time = 0; time < BASE_DURATION && iBot < NOTES_BOT.length; iBot++) {
+            for (let time_m = 0, time_b = 0; time_m < BASE_DURATION && iBot < NOTES_BOT.length; iBot++) {
                 lineBot += NOTES_BOT[iBot].getABCString(KEY);
-                time += NOTES_BOT[iBot].duration;
+                time_m += NOTES_BOT[iBot].duration;
+                time_b += NOTES_BOT[iBot].duration;
+                if (time_b >= BASE_DURATION / 4) { // shouldn't be 4, should be variable
+                    time_b = 0;
+                    lineBot += " ";
+                }
             }
             lineBot += "|";
         }
@@ -203,5 +217,17 @@ const makeMusic = function (key) {
     // set cursor at the beginning
     cursorSet(0);
 }
+
+document.querySelector(".duration_top").addEventListener("click", () => {
+    DURATION_TOP /= 2;
+    if (DURATION_TOP < 3) DURATION_TOP = BASE_DURATION;
+    makeMusic();
+})
+document.querySelector(".duration_bot").addEventListener("click", () => {
+    DURATION_BOT /= 2;
+    if (DURATION_BOT < 3) DURATION_BOT = BASE_DURATION;
+    makeMusic();
+})
+
 
 export { cursorAdv, cursorBck, playedCorrect, makeMusic }
