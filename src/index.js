@@ -43,7 +43,6 @@ navigator.requestMIDIAccess()
 	.then(onfullfilled)
 	.catch(err => console.log(err));
 
-
 document.addEventListener('keydown', e => {
 	if (e.code === "ArrowRight") cursorAdv();
 	if (e.code === "ArrowLeft") cursorBck();

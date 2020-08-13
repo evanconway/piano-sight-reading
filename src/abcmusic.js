@@ -15,6 +15,8 @@ let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
 let DURATION_TOP = 12;
 let DURATION_BOT = 24;
+let NUMBER_TOP = 1;
+let NUMBER_BOT = 1;
 
 let playCursor = 0;
 
@@ -69,8 +71,8 @@ const cursorBck = function () {
 
 const generateABC = function () {
 
-    NOTES_TOP = generateTest(KEY, true, 1, DURATION_TOP);
-    NOTES_BOT = generateTest(KEY, false, 1, DURATION_BOT);
+    NOTES_TOP = generateTest(KEY, true, NUMBER_TOP, DURATION_TOP);
+    NOTES_BOT = generateTest(KEY, false, NUMBER_BOT, DURATION_BOT);
 
     let result = `T:${TITLE}\n`;
     result += `M:${METER}\n`;
@@ -141,6 +143,7 @@ const generateABC = function () {
         result += headerBot;
         result += lineBot + "\n";
     }
+    console.log(result);
     return result;
 }
 
@@ -187,6 +190,7 @@ const generateMidiTimingArr = function() {
         e.pitches.forEach(pitch => MIDI_TIMING_ARRAY[index].push(pitch.midi));
         index += e.duration;
     })
+    console.log(MIDI_TIMING_ARRAY);
     return MIDI_TIMING_ARRAY
 }
 
@@ -229,5 +233,15 @@ document.querySelector(".duration_bot").addEventListener("click", () => {
     makeMusic();
 })
 
+document.querySelector(".number_top").addEventListener("click", () => {
+    NUMBER_TOP++;
+    if (NUMBER_TOP > 4) NUMBER_TOP = 1;
+    makeMusic();
+})
+document.querySelector(".number_bot").addEventListener("click", () => {
+    NUMBER_BOT++;
+    if (NUMBER_BOT > 4) NUMBER_BOT = 1;
+    makeMusic();
+})
 
 export { cursorAdv, cursorBck, playedCorrect, makeMusic }
