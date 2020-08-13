@@ -53,6 +53,40 @@ class Chord {
         return result;
     }
 }
+// returns the note equivalent of the given key and staff index
+const getPitchFromIndex = function(key, index) {
+    /* The first step is to determine the register of this index. We do this by simply 
+    subracting (or adding in the case of negative index) the value of a register (7), 
+    until the index is between 0 and 7. We will then now how far away from register 4 
+    the index is, and can determine it's register. */
+    let register = 0;
+    if (index >= 0) {
+        while (index > 6) {
+            index -= 7;
+            register++;
+        }
+    } else {
+        while (index < 0) {
+            index += 7;
+            register--;
+        }
+    }
+    register += 4;
+    /* Register is now correct, and the index has been modified to be the equivalent pitch
+    class, but in register 4. We can now determine the scale degree of the note using the
+    given key and the index. Recall that each key has a "staff_root" element, which is the
+    staff index of the root of the key. We can count "down" from the index, wrapping around
+    -1 to 6, and incrementing our scale degree by one each decrement. Once our index is
+    equal to our staff_root, we will have found the scale degree of the index */
+    let scaleDegree = 1;
+    while (index !== KEY_SIGNATURES.get(key).get("staff_root")) {
+        index--;
+        if (index < 0) index = 6;
+        scaleDegree++;
+    }
+    
+    return new Pitch(key, scaleDegree, register);
+}
 
 // returns a random pitch in the given key.
 const generateNote = function(key, minReg, maxReg) {
