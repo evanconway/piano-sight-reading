@@ -1,3 +1,38 @@
 body {
-    background-color: beige; 
+    background-color: black;
+    font-size: 25px;
+}
+
+.options {
+    margin-right: 1%;
+    padding: 1.5%;
+    max-width: 30%;
+    float: left;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+}
+
+.option {
+    margin-bottom: 7px;
+}
+
+select {
+    font-size: 20px;
+}
+
+button {
+    margin-top: 4px;
+    font-size: 16px;
+    border-style: solid;
+    border-radius: 3px;
+    border-width: 3px;
+    border-color: black;
+}
+
+.score {
+    padding-left: 5%;
+    padding-right: 5%;
+    background-color: beige;
+    max-width: 75%;
+    float: left;
 }

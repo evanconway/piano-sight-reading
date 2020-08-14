@@ -6,13 +6,39 @@
     <title>Sight Reading</title>
 </head>
 <body>
-    <label for="keys">Select Key Signature:
-        <select name="keys"></select>
-    </label>
-    <button class="duration_top">Top Note Value</button>
-    <button class="duration_bot">Bottom Note Value</button>
-    <button class="number_top">Number of top notes</button>
-    <button class="number_bot">Number of bottom notes</button>
-    <div id="score"></div>
+    <div class="options">
+        <label for="keys">Select Key Signature:
+            <select name="keys"></select>
+        </label>
+        <div class="option">
+            <button class="duration_top">Top Note Value</button>
+            <button class="duration_bot">Bottom Note Value</button>
+        </div>
+        <div class="option">
+            <button class="number_top">Number of top notes</button>
+            <button class="number_bot">Number of bottom notes</button>
+        </div>
+        <div class="option">
+            <div class="note_top_max_label">Maximum Top Staff Note: </div>
+            <button class="note_top_max_raise">Raise</button>
+            <button class="note_top_max_lower">Lower</button>
+        </div>
+        <div class="option">
+            <div class="note_top_min_label">Minimum Top Staff Note: </div>
+            <button class="note_top_min_raise">Raise</button>
+            <button class="note_top_min_lower">Lower</button>
+        </div>
+        <div class="option">
+            <div class="note_bot_max_label">Maximum Bottom Staff Note: </div>
+            <button class="note_bot_max_raise">Raise</button>
+            <button class="note_bot_max_lower">Lower</button>
+        </div>
+        <div class="option">
+            <div class="note_bot_min_label">Minimum Bottom Staff Note: </div>
+            <button class="note_bot_min_raise">Raise</button>
+            <button class="note_bot_min_lower">Lower</button>
+        </div>
+    </div>
+    <div class="score"></div>
 </body>
 </html>
