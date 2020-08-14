@@ -48,8 +48,4 @@ document.addEventListener('keydown', e => {
 	if (e.code === "ArrowLeft") cursorBck();
 });
 
-document.querySelector("select").addEventListener("change", e => {
-	makeMusic(e.target.value)
-})
-
 makeMusic();

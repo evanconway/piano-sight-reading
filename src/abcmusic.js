@@ -5,17 +5,21 @@ const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 const COLOR_SELECT = "#00AA00";
 const COLOR_DEF = "#000000";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
+const BOT_MAX_LABEL = "Maximum Bot Staff Note: ";
+const BOT_MIN_LABEL = "Minimum Bot Staff Note: ";
+const TOP_MAX_LABEL = "Maximum Top Staff Note: ";
+const TOP_MIN_LABEL = "Minimum Top Staff Note: ";
 
 // music consts
 const TITLE = "Sight Reading";
 const METER = "C";
-let KEY = "C";
+let KEY = "E";
 let NOTES_TOP = [];
 let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
 let DURATION_TOP = 12;
 let DURATION_BOT = 24;
-let NUMBER_TOP = 2;
+let NUMBER_TOP = 3;
 let NUMBER_BOT = 1;
 let INDEX_TOP_MAX = 15; // exclusive
 let INDEX_TOP_MIN = 0; // inclusive
@@ -199,9 +203,14 @@ const generateMidiTimingArr = function() {
     return MIDI_TIMING_ARRAY
 }
 
-const makeMusic = function (key) {
+const makeMusic = function () {
 
-    if (key) KEY = key;
+    document.querySelector("select").value = KEY;
+
+    document.querySelector(".note_top_max_label").innerHTML = TOP_MAX_LABEL + INDEX_TOP_MAX;
+    document.querySelector(".note_top_min_label").innerHTML = TOP_MIN_LABEL + INDEX_TOP_MIN;
+    document.querySelector(".note_bot_max_label").innerHTML = BOT_MAX_LABEL + INDEX_BOT_MAX;
+    document.querySelector(".note_bot_min_label").innerHTML = BOT_MIN_LABEL + INDEX_BOT_MIN;
 
     NOTES_TOP = generateNotes(KEY, INDEX_TOP_MIN, INDEX_TOP_MAX, NUMBER_TOP, DURATION_TOP);
     NOTES_BOT = generateNotes(KEY, INDEX_BOT_MIN, INDEX_BOT_MAX, NUMBER_BOT, DURATION_BOT);
@@ -230,6 +239,11 @@ const makeMusic = function (key) {
     cursorSet(0);
 }
 
+document.querySelector("select").addEventListener("change", e => {
+    KEY = e.target.value;
+    makeMusic()
+})
+
 document.querySelector(".duration_top").addEventListener("click", () => {
     DURATION_TOP /= 2;
     if (DURATION_TOP < 3) DURATION_TOP = BASE_DURATION;
@@ -251,53 +265,40 @@ document.querySelector(".number_bot").addEventListener("click", () => {
     if (NUMBER_BOT > 4) NUMBER_BOT = 1;
     makeMusic();
 })
-const TOP_MAX_LABEL = "Maximum Top Staff Note: ";
-const TOP_MIN_LABEL = "Minimum Top Staff Note: ";
+
 document.querySelector(".note_top_max_raise").addEventListener("click", () => {
     INDEX_TOP_MAX++;
-    document.querySelector(".note_top_max_label").innerHTML = TOP_MAX_LABEL + INDEX_TOP_MAX;
     makeMusic();
 })
 document.querySelector(".note_top_max_lower").addEventListener("click", () => {
     if (INDEX_TOP_MAX > INDEX_TOP_MIN) INDEX_TOP_MAX--;
-    document.querySelector(".note_top_max_label").innerHTML = TOP_MAX_LABEL + INDEX_TOP_MAX;
     makeMusic();
 })
 document.querySelector(".note_top_min_raise").addEventListener("click", () => {
     if (INDEX_TOP_MIN < INDEX_TOP_MAX - 1) INDEX_TOP_MIN++;
-    document.querySelector(".note_top_min_label").innerHTML = TOP_MIN_LABEL + INDEX_TOP_MIN;
+    
     makeMusic();
 })
 document.querySelector(".note_top_min_lower").addEventListener("click", () => {
     INDEX_TOP_MIN--;
-    document.querySelector(".note_top_min_label").innerHTML = TOP_MIN_LABEL + INDEX_TOP_MIN;
     makeMusic();
 })
-document.querySelector(".note_top_max_label").innerHTML = TOP_MAX_LABEL + INDEX_TOP_MAX;
-document.querySelector(".note_top_min_label").innerHTML = TOP_MIN_LABEL + INDEX_TOP_MIN;
-const BOT_MAX_LABEL = "Maximum Bot Staff Note: ";
-const BOT_MIN_LABEL = "Minimum Bot Staff Note: ";
 document.querySelector(".note_bot_max_raise").addEventListener("click", () => {
     INDEX_BOT_MAX++;
-    document.querySelector(".note_bot_max_label").innerHTML = BOT_MAX_LABEL + INDEX_BOT_MAX;
     makeMusic();
 })
 document.querySelector(".note_bot_max_lower").addEventListener("click", () => {
     if (INDEX_BOT_MAX > INDEX_BOT_MIN) INDEX_BOT_MAX--;
-    document.querySelector(".note_bot_max_label").innerHTML = BOT_MAX_LABEL + INDEX_BOT_MAX;
+    
     makeMusic();
 })
 document.querySelector(".note_bot_min_raise").addEventListener("click", () => {
     if (INDEX_BOT_MIN < INDEX_BOT_MAX - 1) INDEX_BOT_MIN++;
-    document.querySelector(".note_bot_min_label").innerHTML = BOT_MIN_LABEL + INDEX_BOT_MIN;
     makeMusic();
 })
 document.querySelector(".note_bot_min_lower").addEventListener("click", () => {
     INDEX_BOT_MIN--;
-    document.querySelector(".note_bot_min_label").innerHTML = BOT_MIN_LABEL + INDEX_BOT_MIN;
     makeMusic();
 })
-document.querySelector(".note_bot_max_label").innerHTML = BOT_MAX_LABEL + INDEX_BOT_MAX;
-document.querySelector(".note_bot_min_label").innerHTML = BOT_MIN_LABEL + INDEX_BOT_MIN;
 
 export { cursorAdv, cursorBck, playedCorrect, makeMusic }

@@ -79,6 +79,16 @@ class Chord {
         result += "]" + this.duration.toString();
         return result;
     }
+
+    getIndicies() {
+        let inds = "[";
+        for (let i = 0; i < this.pitches.length; i++) {
+            if (i === this.pitches.length - 1) inds += this.pitches[i].staffIndex;
+            else inds += this.pitches[i].staffIndex + ", ";
+        }
+        inds += "]";
+        return inds;
+    }
 }
 // returns the note equivalent of the given key and staff index
 const getPitchFromIndex = function(key, index) {
@@ -145,15 +155,18 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
         let chord = new Chord(duration);
 
         // we declare our pitch options by making an array of all valid staff indices
-        let pOptions = new Array(indMax - indMin);
-        for (let p = 0; p < pOptions.length; p++) pOptions[p] = indMin + p;
+        let options = new Array(indMax - indMin);
+        for (let p = 0; p < options.length; p++) options[p] = indMin + p;
 
         for (let j = 0; j < numOfPitches; j++) {
             /* We randomly choose an index from the options array, create a pitch from it,
             add it to the chord, and remove that pitch from our options. */
-            let choice = pOptions[Math.floor(Math.random() * pOptions.length)]
+            let choiceIndex = Math.floor(Math.random() * options.length)
+            let choice = options[choiceIndex]
             chord.addPitch(getPitchFromIndex(key, choice));
-            pOptions.splice(choice, 1);
+            options.splice(choiceIndex, 1);
+
+            // console.log(`Chord Indices: ${chord.getIndicies()}`);
 
             /* In order to prevent the music from being unplayable, we have to remove 
             pitch options that are too far away from pitches already in our chord. We've
@@ -161,14 +174,25 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
             options that are more an than octave higher than the lowest note. */
             let remove = chord.staffIndexLowest + 7;
             let index = 0;
-            while (pOptions[index] <= remove) index++;
-            pOptions.splice(index, pOptions.length - index);
+
+            // console.log(`Lowest in chord is ${chord.staffIndexLowest}, highest allowable is ${remove}. Options before delete top:`);
+            // console.log(options);
+
+            while (options[index] <= remove) index++;
+            options.splice(index, options.length - index);
 
             // now we remove the low notes with the same logic
             remove = chord.staffIndexHighest - 7;
-            index = pOptions.length - 1;
-            while (pOptions[index] > remove) index--;
-            pOptions.splice(0, index);
+            index = options.length - 1;
+
+            // console.log(`Highest in chord is ${chord.staffIndexHighest}, lowest allowable is ${remove}. Options after delete top, before delete bottom:`);
+            // console.log(options);
+
+            while (options[index] > remove) index--;
+            options.splice(0, index);
+
+            // console.log("Options after delete bottom");
+            // console.log(options);
         }
         arr.push(chord);
     }
