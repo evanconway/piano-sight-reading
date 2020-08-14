@@ -102,14 +102,29 @@ const generateNote = function(key, indMin, indMax) {
     return getPitchFromIndex(key, index);
 }
 
-const generateNotes = function (key, topOrBot = true, numOfPitches = 1, duration = 12) {
+/* returns an array of chord objects, each with the given duration, number of pitches, and 
+pitches between the min (inclusive) and the max (exclusive) */
+const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitches = 1, duration = 12) {
+
+    /* I straight up forgot how this line works! I know that it only works for 4/4 timing, and the
+    5 is for 5 lines of music. Must revist and make work with other time signatures. */
     const noteNum = 5 * 16 / (duration / 12);
-    const arr = [];
+
+    const arr = []; // the array of chords
+
     for (let i = 0; i < noteNum; i++) {
         let c = new Chord(duration);
+
+        // we declare our pitch options by making an array of all valid staff indices
+        let pOptions = new Array(indMax - indMin);
+        for (let p = 0; p < pOptions.length; p++) pOptions[p] = indMin + p;
+
         for (let j = 0; j < numOfPitches; j++) {
-            if (topOrBot) c.addPitch(generateNote(key, 0, 3));
-            else c.addPitch(generateNote(key, -2, 1));
+            /* We randomly choose an index from the options array, create a pitch from it, 
+            then remove that index from the array to prevent duplicates. */
+            let choice = pOptions[Math.floor(Math.random() * pOptions.length)]
+            c.addPitch(getPitchFromIndex(key, choice));
+            pOptions.splice(choice, 1);
         }
         arr.push(c);
     }

@@ -71,9 +71,6 @@ const cursorBck = function () {
 
 const generateABC = function () {
 
-    NOTES_TOP = generateNotes(KEY, true, NUMBER_TOP, DURATION_TOP);
-    NOTES_BOT = generateNotes(KEY, false, NUMBER_BOT, DURATION_BOT);
-
     let result = `T:${TITLE}\n`;
     result += `M:${METER}\n`;
     result += `L:1/${BASE_DURATION}\n`;
@@ -201,6 +198,9 @@ const generateMidiTimingArr = function() {
 const makeMusic = function (key) {
 
     if (key) KEY = key;
+
+    NOTES_TOP = generateNotes(KEY, 0, 14, NUMBER_TOP, DURATION_TOP);
+    NOTES_BOT = generateNotes(KEY, -14, 0, NUMBER_BOT, DURATION_BOT);
 
 	/* I'm going to link the documentation right here: 
 	https://paulrosen.github.io/abcjs/visual/render-abc-options.html
