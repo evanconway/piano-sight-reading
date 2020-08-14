@@ -75,7 +75,7 @@ KEY_SIGNATURES.set("Cb", makeScaleMajor("C", 11, 0));
 
 // minor keys
 KEY_SIGNATURES.set("Am", makeScaleMinor("A", 9, 5));
-KEY_SIGNATURES.set("Em", makeScaleMinor("A", 4, 2));
+KEY_SIGNATURES.set("Em", makeScaleMinor("E", 4, 2));
 KEY_SIGNATURES.set("Bm", makeScaleMinor("B", 11, 6));
 KEY_SIGNATURES.set("F#m", makeScaleMinor("F", 6, 3));
 KEY_SIGNATURES.set("C#m", makeScaleMinor("C", 1, 0));

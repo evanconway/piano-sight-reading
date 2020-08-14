@@ -88,11 +88,18 @@ const getPitchFromIndex = function(key, index) {
     return new Pitch(key, scaleDegree, register);
 }
 
-// returns a random pitch in the given key.
-const generateNote = function(key, minReg, maxReg) {
-    let scaleDegree = 1 + Math.floor(Math.random() * 6);
-    let register = minReg + Math.floor(Math.random() * (maxReg - minReg + 1));
-    return new Pitch(key, scaleDegree, register);
+// returns a random pitch in the given key between min (inclusive) and max (exclusive)
+const generateNote = function(key, indMin, indMax) {
+    /* To create a random index, first we create a range starting at 0 of the same size as
+    the range between min and max. Next we choose a random index in that range. Finally
+    we add min to the chosen index to move index within the range of min and max. For 
+    example, let's say the min and max is -3 to 3. The 0 based equivalent range is 0 to 6. 
+    And let's say our randomly chosen index is 1. We then add min, which is -3, to that 
+    value to obtain our final index, -2. */
+    let range = indMax - indMin;
+    let index = Math.floor(Math.random() * range);
+    index += indMin;
+    return getPitchFromIndex(key, index);
 }
 
 const generateTest = function (key, topOrBot = true, numOfPitches = 1, duration = 12) {
@@ -101,8 +108,8 @@ const generateTest = function (key, topOrBot = true, numOfPitches = 1, duration 
     for (let i = 0; i < noteNum; i++) {
         let c = new Chord(duration);
         for (let j = 0; j < numOfPitches; j++) {
-            if (topOrBot) c.addPitch(generateNote(key, 4, 5));
-            else c.addPitch(generateNote(key, 2, 3));
+            if (topOrBot) c.addPitch(generateNote(key, 0, 3));
+            else c.addPitch(generateNote(key, -2, 1));
         }
         arr.push(c);
     }

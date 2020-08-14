@@ -175,7 +175,9 @@ const generateMidiTimingArr = function() {
         for (let i = 0; i < e.duration; i++) MIDI_TIMING_ARRAY.push(null); // add correct "duration"
         e.timingIndex = index;
         MIDI_TIMING_ARRAY[index] = [];
-        e.pitches.forEach(pitch => MIDI_TIMING_ARRAY[index].push(pitch.midi));
+        e.pitches.forEach(pitch => {
+            if (!MIDI_TIMING_ARRAY[index].includes(pitch.midi)) MIDI_TIMING_ARRAY[index].push(pitch.midi);
+        });
         index = MIDI_TIMING_ARRAY.length;
     });
     /* Now the bottom staff. Note that this loop will not add values to the MIDI_TIMING_ARRAY.
@@ -187,7 +189,9 @@ const generateMidiTimingArr = function() {
     NOTES_BOT.forEach(e => {
         e.timingIndex = index;
         if (MIDI_TIMING_ARRAY[index] === null) MIDI_TIMING_ARRAY[index] = [];
-        e.pitches.forEach(pitch => MIDI_TIMING_ARRAY[index].push(pitch.midi));
+        e.pitches.forEach(pitch => {
+            if (!MIDI_TIMING_ARRAY[index].includes(pitch.midi)) MIDI_TIMING_ARRAY[index].push(pitch.midi);
+        });
         index += e.duration;
     })
     console.log(MIDI_TIMING_ARRAY);
