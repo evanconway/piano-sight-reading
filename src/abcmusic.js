@@ -15,7 +15,7 @@ let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
 let DURATION_TOP = 12;
 let DURATION_BOT = 24;
-let NUMBER_TOP = 1;
+let NUMBER_TOP = 2;
 let NUMBER_BOT = 1;
 
 let playCursor = 0;
@@ -199,7 +199,7 @@ const makeMusic = function (key) {
 
     if (key) KEY = key;
 
-    NOTES_TOP = generateNotes(KEY, 0, 14, NUMBER_TOP, DURATION_TOP);
+    NOTES_TOP = generateNotes(KEY, 0, 15, NUMBER_TOP, DURATION_TOP);
     NOTES_BOT = generateNotes(KEY, -14, 0, NUMBER_BOT, DURATION_BOT);
 
 	/* I'm going to link the documentation right here: 

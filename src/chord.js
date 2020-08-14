@@ -9,7 +9,7 @@ const KEY_MENU = document.querySelector("select");
 KEY_MENU.innerHTML = options;
 
 class Pitch {
-    constructor(key, scaleDegree, register) {
+    constructor(key, scaleDegree, register, staffIndex = null) {
         this.key = key;
         this.scaleDegree = scaleDegree;
 
@@ -24,6 +24,13 @@ class Pitch {
         this.string = KEY_SIGNATURES.get(key).get(scaleDegree)[0];
         if (register < 4) for (let i = 4; i > register; i--) this.string += ",";
         else for (let i = 4; i < register; i++) this.string += "'";
+
+        /* If the user was kind enough to tell us the staff index, assign it. 
+        Otherwise we must generate it ourselves. */
+        this.staffIndex = staffIndex;
+        if (staffIndex === null) {
+            // not implemented
+        }
     }
 }
 
@@ -38,10 +45,30 @@ class Chord {
         this.duration = duration; // the ABC modifier for the default length
         this.path = null; // reference to the html element of the note
         this.timingIndex = null; // index this note exists in the timing array
+        this.staffIndexLowest = null; // for determining pitch limits in multi pitch chords
+        this.staffIndexHighest = null; // same as above
     }
 
     addPitch(pitch) {
-        this.pitches.push(pitch);
+        if (this.pitches.length === 0) {
+            this.pitches.push(pitch);
+            this.staffIndexLowest = pitch.staffIndex;
+            this.staffIndexHighest = pitch.staffIndex;
+            return;
+        }
+
+        /* In a chord with multiple pitches, pitches must be sorted from lowest
+        staff index to highest staff index. */
+        this.pitches.push(null);
+        for (let i = 0, pitchToMove = pitch; i < this.pitches.length; i++) {
+            if (this.pitches[i] === null || pitchToMove.staffIndex < this.pitches[i].staffIndex) {
+                let temp = this.pitches[i];
+                this.pitches[i] = pitchToMove;
+                pitchToMove = temp;
+            }
+        }
+        this.staffIndexLowest = this.pitches[0].staffIndex;
+        this.staffIndexHighest = this.pitches[this.pitches.length - 1].staffIndex;
     }
 
     getABCString() {
@@ -55,6 +82,8 @@ class Chord {
 }
 // returns the note equivalent of the given key and staff index
 const getPitchFromIndex = function(key, index) {
+    let orgIndex = index; // we need this later
+
     /* The first step is to determine the register of this index. We do this by simply 
     subracting (or adding in the case of negative index) the value of a register (7), 
     until the index is between 0 and 7. We will then now how far away from register 4 
@@ -85,7 +114,7 @@ const getPitchFromIndex = function(key, index) {
         scaleDegree++;
     }
     
-    return new Pitch(key, scaleDegree, register);
+    return new Pitch(key, scaleDegree, register, orgIndex);
 }
 
 // returns a random pitch in the given key between min (inclusive) and max (exclusive)
@@ -113,20 +142,35 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
     const arr = []; // the array of chords
 
     for (let i = 0; i < noteNum; i++) {
-        let c = new Chord(duration);
+        let chord = new Chord(duration);
 
         // we declare our pitch options by making an array of all valid staff indices
         let pOptions = new Array(indMax - indMin);
         for (let p = 0; p < pOptions.length; p++) pOptions[p] = indMin + p;
 
         for (let j = 0; j < numOfPitches; j++) {
-            /* We randomly choose an index from the options array, create a pitch from it, 
-            then remove that index from the array to prevent duplicates. */
+            /* We randomly choose an index from the options array, create a pitch from it,
+            add it to the chord, and remove that pitch from our options. */
             let choice = pOptions[Math.floor(Math.random() * pOptions.length)]
-            c.addPitch(getPitchFromIndex(key, choice));
+            chord.addPitch(getPitchFromIndex(key, choice));
             pOptions.splice(choice, 1);
+
+            /* In order to prevent the music from being unplayable, we have to remove 
+            pitch options that are too far away from pitches already in our chord. We've
+            chosen an octave to be the maximum span of a chord. First, we'll remove all
+            options that are more an than octave higher than the lowest note. */
+            let remove = chord.staffIndexLowest + 7;
+            let index = 0;
+            while (pOptions[index] <= remove) index++;
+            pOptions.splice(index, pOptions.length - index);
+
+            // now we remove the low notes with the same logic
+            remove = chord.staffIndexHighest - 7;
+            index = pOptions.length - 1;
+            while (pOptions[index] > remove) index--;
+            pOptions.splice(0, index);
         }
-        arr.push(c);
+        arr.push(chord);
     }
     return arr;
 }
