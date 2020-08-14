@@ -102,7 +102,7 @@ const generateNote = function(key, indMin, indMax) {
     return getPitchFromIndex(key, index);
 }
 
-const generateTest = function (key, topOrBot = true, numOfPitches = 1, duration = 12) {
+const generateNotes = function (key, topOrBot = true, numOfPitches = 1, duration = 12) {
     const noteNum = 5 * 16 / (duration / 12);
     const arr = [];
     for (let i = 0; i < noteNum; i++) {
@@ -116,4 +116,4 @@ const generateTest = function (key, topOrBot = true, numOfPitches = 1, duration 
     return arr;
 }
 
-export { Chord, generateTest}
+export { Chord, generateNotes}

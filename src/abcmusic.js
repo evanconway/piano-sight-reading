@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import {Chord, generateTest} from "./chord";
+import {Chord, generateNotes} from "./chord";
 
 const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 const COLOR_SELECT = "#00AA00";
@@ -71,8 +71,8 @@ const cursorBck = function () {
 
 const generateABC = function () {
 
-    NOTES_TOP = generateTest(KEY, true, NUMBER_TOP, DURATION_TOP);
-    NOTES_BOT = generateTest(KEY, false, NUMBER_BOT, DURATION_BOT);
+    NOTES_TOP = generateNotes(KEY, true, NUMBER_TOP, DURATION_TOP);
+    NOTES_BOT = generateNotes(KEY, false, NUMBER_BOT, DURATION_BOT);
 
     let result = `T:${TITLE}\n`;
     result += `M:${METER}\n`;
