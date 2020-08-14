@@ -21,10 +21,10 @@ let DURATION_TOP = 12;
 let DURATION_BOT = 24;
 let NUMBER_TOP = 3;
 let NUMBER_BOT = 1;
-let INDEX_TOP_MAX = 15; // exclusive
-let INDEX_TOP_MIN = 0; // inclusive
-let INDEX_BOT_MAX = 0; // exclusive
-let INDEX_BOT_MIN = -14; // inclusive
+let INDEX_TOP_MAX = 15; // all max/min indices are inclusive
+let INDEX_TOP_MIN = 0;
+let INDEX_BOT_MAX = 0;
+let INDEX_BOT_MIN = -14;
 
 let playCursor = 0;
 
@@ -212,6 +212,10 @@ const makeMusic = function () {
     document.querySelector(".note_bot_max_label").innerHTML = BOT_MAX_LABEL + INDEX_BOT_MAX;
     document.querySelector(".note_bot_min_label").innerHTML = BOT_MIN_LABEL + INDEX_BOT_MIN;
 
+    // limit number of notes based on duration
+    if (INDEX_TOP_MAX - INDEX_TOP_MIN < NUMBER_TOP - 1) NUMBER_TOP = INDEX_TOP_MAX - INDEX_TOP_MIN + 1;
+    if (INDEX_BOT_MAX - INDEX_BOT_MIN < NUMBER_BOT - 1) NUMBER_BOT = INDEX_BOT_MAX - INDEX_BOT_MIN + 1;
+
     NOTES_TOP = generateNotes(KEY, INDEX_TOP_MIN, INDEX_TOP_MAX, NUMBER_TOP, DURATION_TOP);
     NOTES_BOT = generateNotes(KEY, INDEX_BOT_MIN, INDEX_BOT_MAX, NUMBER_BOT, DURATION_BOT);
 
@@ -271,13 +275,16 @@ document.querySelector(".note_top_max_raise").addEventListener("click", () => {
     makeMusic();
 })
 document.querySelector(".note_top_max_lower").addEventListener("click", () => {
-    if (INDEX_TOP_MAX > INDEX_TOP_MIN) INDEX_TOP_MAX--;
-    makeMusic();
+    if (INDEX_TOP_MAX > INDEX_TOP_MIN) {
+        INDEX_TOP_MAX--;
+        makeMusic();
+    }
 })
 document.querySelector(".note_top_min_raise").addEventListener("click", () => {
-    if (INDEX_TOP_MIN < INDEX_TOP_MAX - 1) INDEX_TOP_MIN++;
-    
-    makeMusic();
+    if (INDEX_TOP_MIN < INDEX_TOP_MAX) {
+        INDEX_TOP_MIN++;
+        makeMusic();
+    }
 })
 document.querySelector(".note_top_min_lower").addEventListener("click", () => {
     INDEX_TOP_MIN--;
@@ -288,13 +295,16 @@ document.querySelector(".note_bot_max_raise").addEventListener("click", () => {
     makeMusic();
 })
 document.querySelector(".note_bot_max_lower").addEventListener("click", () => {
-    if (INDEX_BOT_MAX > INDEX_BOT_MIN) INDEX_BOT_MAX--;
-    
-    makeMusic();
+    if (INDEX_BOT_MAX > INDEX_BOT_MIN) {
+        INDEX_BOT_MAX--;
+        makeMusic();
+    }
 })
 document.querySelector(".note_bot_min_raise").addEventListener("click", () => {
-    if (INDEX_BOT_MIN < INDEX_BOT_MAX - 1) INDEX_BOT_MIN++;
-    makeMusic();
+    if (INDEX_BOT_MIN < INDEX_BOT_MAX) {
+        INDEX_BOT_MIN++;
+        makeMusic();
+    }
 })
 document.querySelector(".note_bot_min_lower").addEventListener("click", () => {
     INDEX_BOT_MIN--;

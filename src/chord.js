@@ -142,7 +142,7 @@ const generateNote = function(key, indMin, indMax) {
 }
 
 /* returns an array of chord objects, each with the given duration, number of pitches, and 
-pitches between the min (inclusive) and the max (exclusive) */
+pitches between the min and max (inclusive) */
 const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitches = 1, duration = 12) {
 
     /* I straight up forgot how this line works! I know that it only works for 4/4 timing, and the
@@ -155,8 +155,9 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
         let chord = new Chord(duration);
 
         // we declare our pitch options by making an array of all valid staff indices
-        let options = new Array(indMax - indMin);
+        let options = new Array(indMax - indMin + 1);
         for (let p = 0; p < options.length; p++) options[p] = indMin + p;
+        console.log(options);
 
         for (let j = 0; j < numOfPitches; j++) {
             /* We randomly choose an index from the options array, create a pitch from it,
