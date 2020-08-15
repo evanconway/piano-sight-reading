@@ -6,20 +6,20 @@ body {
 .options {
     margin-right: 1%;
     padding: 1.5%;
-    max-width: 30%;
+    max-width: 25%;
     float: left;
     background-color: #f0f0f0;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 .option {
-    margin-bottom: 7px;
+    margin-bottom: 30px;
 }
 
 select {
     font-size: 20px;
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 25px;
+    padding-right: 25px;
 }
 
 button {
@@ -35,6 +35,7 @@ button {
     padding-left: 5%;
     padding-right: 5%;
     background-color: beige;
-    max-width: 75%;
+    max-width: 60%;
     float: left;
+    border-radius: 4px;
 }

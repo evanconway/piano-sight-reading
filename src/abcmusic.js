@@ -5,6 +5,19 @@ const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 const COLOR_SELECT = "#00AA00";
 const COLOR_DEF = "#000000";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
+const DURATIONS = new Map();
+DURATIONS.set("Whole", BASE_DURATION);
+DURATIONS.set("Half", BASE_DURATION / 2);
+DURATIONS.set("Quarter", BASE_DURATION / 4);
+DURATIONS.set("Eighth", BASE_DURATION / 8);
+
+// populate duration drop downs with these values:
+let durations = "";
+DURATIONS.forEach((duration, name) => {
+    durations += `<option value="${duration}">${name}</option>`;
+})
+document.querySelector(".duration_top").innerHTML = durations;
+document.querySelector(".duration_bot").innerHTML = durations;
 
 // music consts
 const TITLE = "Sight Reading";
@@ -208,7 +221,11 @@ const generateMidiTimingArr = function() {
 const makeMusic = function () {
 
     // ensure the key signature drop down shows the correct value
-    document.querySelector("select").value = KEY;
+    document.querySelector(".keys").value = KEY;
+
+    // ensure duration drop downs show correct value
+    document.querySelector(".duration_top").value = DURATION_TOP;
+    document.querySelector(".duration_bot").value = DURATION_BOT;
 
     /* Populate the note range drop downs with allowable values. Note that our design does not permit
     for a min index to be greater than a max index, or vice versa. Also note that we populate from 
@@ -238,13 +255,13 @@ const makeMusic = function () {
     options = "";
     let range = INDEX_TOP_MAX - INDEX_TOP_MIN + 1; // add 1 because if indices are the same, that allows 1 note
     if (range > NUMBER_MAX) range = NUMBER_MAX;
-    for (let i = 1; i <= range; i++) options += `<option value="${i}">${i}</option>`;
+    for (let i = NUMBER_MIN; i <= range; i++) options += `<option value="${i}">${i}</option>`;
     document.querySelector(".number_top").innerHTML = options;
     document.querySelector(".number_top").value = NUMBER_TOP;
     options = "";
     range = INDEX_BOT_MAX - INDEX_BOT_MIN + 1;
     if (range > NUMBER_MAX) range = NUMBER_MAX;
-    for (let i = 1; i <= range; i++) options += `<option value="${i}">${i}</option>`;
+    for (let i = NUMBER_MIN; i <= range; i++) options += `<option value="${i}">${i}</option>`;
     document.querySelector(".number_bot").innerHTML = options;
     document.querySelector(".number_bot").value = NUMBER_BOT;
 
@@ -258,7 +275,8 @@ const makeMusic = function () {
 	It's important to understand why we've chosen the options we have...  
 	if we decide to use them */
     abcjs.renderAbc(document.querySelector(".score"), generateABC(), {
-        add_classes: true
+        add_classes: true,
+        staffwidth: 1100,
     })
 
 	/* We need to be able to refer to the html to change the color of notes. We do that
@@ -284,15 +302,13 @@ document.querySelector(".keys").addEventListener("change", e => {
     makeMusic()
 })
 
-// note duration buttons
-document.querySelector(".duration_top").addEventListener("click", () => {
-    DURATION_TOP /= 2;
-    if (DURATION_TOP < 3) DURATION_TOP = BASE_DURATION;
+// note duration drop downs
+document.querySelector(".duration_top").addEventListener("change", e => {
+    DURATION_TOP = parseInt(e.target.value);
     makeMusic();
 })
-document.querySelector(".duration_bot").addEventListener("click", () => {
-    DURATION_BOT /= 2;
-    if (DURATION_BOT < 3) DURATION_BOT = BASE_DURATION;
+document.querySelector(".duration_bot"). addEventListener("change", e => {
+    DURATION_BOT = parseInt(e.target.value);
     makeMusic();
 })
 
@@ -323,7 +339,5 @@ document.querySelector(".note_bot_max").addEventListener("change", e => {
     INDEX_BOT_MAX = parseInt(e.target.value);
     makeMusic();
 })
-
-
 
 export { cursorAdv, cursorBck, playedCorrect, makeMusic }
