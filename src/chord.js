@@ -127,20 +127,6 @@ const getPitchFromIndex = function(key, index) {
     return new Pitch(key, scaleDegree, register, orgIndex);
 }
 
-// returns a random pitch in the given key between min (inclusive) and max (exclusive)
-const generateNote = function(key, indMin, indMax) {
-    /* To create a random index, first we create a range starting at 0 of the same size as
-    the range between min and max. Next we choose a random index in that range. Finally
-    we add min to the chosen index to move index within the range of min and max. For 
-    example, let's say the min and max is -3 to 3. The 0 based equivalent range is 0 to 6. 
-    And let's say our randomly chosen index is 1. We then add min, which is -3, to that 
-    value to obtain our final index, -2. */
-    let range = indMax - indMin;
-    let index = Math.floor(Math.random() * range);
-    index += indMin;
-    return getPitchFromIndex(key, index);
-}
-
 /* returns an array of chord objects, each with the given duration, number of pitches, and 
 pitches between the min and max (inclusive) */
 const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitches = 1, duration = 12) {
