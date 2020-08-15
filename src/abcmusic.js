@@ -279,6 +279,16 @@ const makeMusic = function () {
         staffwidth: 1100,
     })
 
+    Array.from(document.querySelectorAll("rect")).forEach(rect => {
+        let clone = rect.cloneNode(true);
+        rect.parentNode.replaceChild(clone, rect);
+    })
+
+    /*
+    var el = document.getElementById('el-id'), elClone = el.cloneNode(true);
+    el.parentNode.replaceChild(elClone, el);
+    */
+
 	/* We need to be able to refer to the html to change the color of notes. We do that
 	with query selectors. The generateABC function does more than create strings. It also
 	creates music objects that represent the music. The assign paths function gives

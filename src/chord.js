@@ -141,7 +141,9 @@ const getPitchStringFromIndex = function(index) {
             register--;
         }
     }
-    return LETTERS[index] + register.toString();
+    let string = LETTERS[index] + register.toString();
+    if (string === "C4") string += " *";
+    return string;
 }
 
 /* returns an array of chord objects, each with the given duration, number of pitches, and 
