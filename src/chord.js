@@ -72,7 +72,7 @@ class Chord {
     }
 
     getABCString() {
-        if (this.pitches.length === 0) return null; // maybe we could use length 0 to represent rests??
+        if (this.pitches.length === 0) return "x" + this.duration.toString(); // maybe we could use length 0 to represent rests??
         if (this.pitches.length === 1) return this.pitches[0].string + this.duration.toString();
         let result = "[";
         this.pitches.forEach(e => result += e.string);

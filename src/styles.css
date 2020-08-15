@@ -5,7 +5,7 @@ body {
 
 .options {
     margin-right: 1%;
-    padding: 1.5%;
+    padding: 0.5%;
     max-width: 25%;
     float: left;
     background-color: #f0f0f0;
@@ -32,8 +32,8 @@ button {
 }
 
 .score {
-    padding-left: 5%;
-    padding-right: 5%;
+    padding-left: 1%;
+    padding-right: 1%;
     background-color: beige;
     max-width: 60%;
     float: left;
