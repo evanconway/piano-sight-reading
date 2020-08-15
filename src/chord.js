@@ -152,33 +152,20 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
             chord.addPitch(getPitchFromIndex(key, choice));
             options.splice(choiceIndex, 1);
 
-            // console.log(`Chord Indices: ${chord.getIndicies()}`);
-
             /* In order to prevent the music from being unplayable, we have to remove 
             pitch options that are too far away from pitches already in our chord. We've
             chosen an octave to be the maximum span of a chord. First, we'll remove all
             options that are more an than octave higher than the lowest note. */
             let remove = chord.staffIndexLowest + 7;
             let index = 0;
-
-            // console.log(`Lowest in chord is ${chord.staffIndexLowest}, highest allowable is ${remove}. Options before delete top:`);
-            // console.log(options);
-
             while (options[index] <= remove) index++;
             options.splice(index, options.length - index);
 
             // now we remove the low notes with the same logic
             remove = chord.staffIndexHighest - 7;
             index = options.length - 1;
-
-            // console.log(`Highest in chord is ${chord.staffIndexHighest}, lowest allowable is ${remove}. Options after delete top, before delete bottom:`);
-            // console.log(options);
-
             while (options[index] > remove) index--;
             options.splice(0, index);
-
-            // console.log("Options after delete bottom");
-            // console.log(options);
         }
 
         arr.push(chord);
