@@ -5,10 +5,6 @@ const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 const COLOR_SELECT = "#00AA00";
 const COLOR_DEF = "#000000";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
-const BOT_MAX_LABEL = "Maximum Bot Staff Note: ";
-const BOT_MIN_LABEL = "Minimum Bot Staff Note: ";
-const TOP_MAX_LABEL = "Maximum Top Staff Note: ";
-const TOP_MIN_LABEL = "Minimum Top Staff Note: ";
 
 // music consts
 const TITLE = "Sight Reading";
@@ -19,6 +15,8 @@ let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
 let DURATION_TOP = 12;
 let DURATION_BOT = 24;
+const NUMBER_MAX = 4;
+const NUMBER_MIN = 1;
 let NUMBER_TOP = 3;
 let NUMBER_BOT = 1;
 let INDEX_TOP_MAX = 15; // all max/min indices are inclusive
@@ -212,7 +210,8 @@ const makeMusic = function () {
     // ensure the key signature drop down shows the correct value
     document.querySelector("select").value = KEY;
 
-    // populate the note range drop downs with allowable values
+    /* Populate the note range drop downs with allowable values. Note that it should not be possible
+    for an index_max to be less than an index_min, or vice versa. */
     let options = "";
     for (let i = INDEX_TOP_MIN_CAP; i <= INDEX_TOP_MAX; i++) options += `<option value="${i}">${i}</option>`;
     document.querySelector(".note_top_min").innerHTML = options;
@@ -230,9 +229,23 @@ const makeMusic = function () {
     document.querySelector(".note_bot_max").innerHTML = options;
     document.querySelector(".note_bot_max").value = INDEX_BOT_MAX;
 
-    // limit number of notes based on duration
+    // limit number of notes based on min and max staff indices
     if (INDEX_TOP_MAX - INDEX_TOP_MIN < NUMBER_TOP - 1) NUMBER_TOP = INDEX_TOP_MAX - INDEX_TOP_MIN + 1;
     if (INDEX_BOT_MAX - INDEX_BOT_MIN < NUMBER_BOT - 1) NUMBER_BOT = INDEX_BOT_MAX - INDEX_BOT_MIN + 1;
+
+    // populate number of note drop downs with allowable values
+    options = "";
+    let range = INDEX_TOP_MAX - INDEX_TOP_MIN + 1; // add 1 because if indices are the same, that allows 1 note
+    if (range > NUMBER_MAX) range = NUMBER_MAX;
+    for (let i = 1; i <= range; i++) options += `<option value="${i}">${i}</option>`;
+    document.querySelector(".number_top").innerHTML = options;
+    document.querySelector(".number_top").value = NUMBER_TOP;
+    options = "";
+    range = INDEX_BOT_MAX - INDEX_BOT_MIN + 1;
+    if (range > NUMBER_MAX) range = NUMBER_MAX;
+    for (let i = 1; i <= range; i++) options += `<option value="${i}">${i}</option>`;
+    document.querySelector(".number_bot").innerHTML = options;
+    document.querySelector(".number_bot").value = NUMBER_BOT;
 
     // generate notes
     NOTES_TOP = generateNotes(KEY, INDEX_TOP_MIN, INDEX_TOP_MAX, NUMBER_TOP, DURATION_TOP);
@@ -282,15 +295,13 @@ document.querySelector(".duration_bot").addEventListener("click", () => {
     makeMusic();
 })
 
-// number of note buttons
-document.querySelector(".number_top").addEventListener("click", () => {
-    NUMBER_TOP++;
-    if (NUMBER_TOP > 4) NUMBER_TOP = 1;
+// number of note drop downs
+document.querySelector(".number_top").addEventListener("change", e => {
+    NUMBER_TOP = parseInt(e.target.value);
     makeMusic();
 })
-document.querySelector(".number_bot").addEventListener("click", () => {
-    NUMBER_BOT++;
-    if (NUMBER_BOT > 4) NUMBER_BOT = 1;
+document.querySelector(".number_bot").addEventListener("change", e => {
+    NUMBER_BOT = parseInt(e.target.value);
     makeMusic();
 })
 

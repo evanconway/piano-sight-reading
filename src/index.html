@@ -7,16 +7,20 @@
 </head>
 <body>
     <div class="options">
-        <label for="keys">Select Key Signature:
-            <select class="keys"></select>
-        </label>
+        <div class="option">
+            Select Key Signature: <select class="keys"></select>
+        </div>
         <div class="option">
             <button class="duration_top">Top Note Value</button>
             <button class="duration_bot">Bottom Note Value</button>
         </div>
         <div class="option">
-            <button class="number_top">Number of top notes</button>
-            <button class="number_bot">Number of bottom notes</button>
+            <div>
+                Number of notes in top staff: <select class="number_top"></select>
+            </div>
+            <div>
+                Number of notes in bottom staff: <select class="number_bot"></select>
+            </div>
         </div>
         <div class="option">
             Top Staff Range: <select class="note_top_min"></select> to <select class="note_top_max"></select>
