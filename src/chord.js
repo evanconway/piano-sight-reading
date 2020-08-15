@@ -158,14 +158,22 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
             options that are more an than octave higher than the lowest note. */
             let remove = chord.staffIndexLowest + 7;
             let index = 0;
-            while (options[index] <= remove) index++;
+            while (index < options.length && options[index] <= remove) index++;
+            /* The index is now at the first position where the option is an invalid
+            for the remainder of the array. Since splice deletes n elements, we have 
+            to use the number of elements remaining in the array. */
             options.splice(index, options.length - index);
 
             // now we remove the low notes with the same logic
             remove = chord.staffIndexHighest - 7;
             index = options.length - 1;
-            while (options[index] > remove) index--;
-            options.splice(0, index);
+            while (index >= 0 && options[index] >= remove) index--;
+            /* Moving backwards, the index is now at the position of the first element
+            that is less than remove. Since the splice function takes a length, and not
+            an end index, we need to add 1 to the index for it to work. For example, 
+            let's say we need to remove the first 3 values. This means the index would 
+            stopped at 2, so it must be increased to 3 for the splice to work. */
+            options.splice(0, index + 1);
         }
 
         arr.push(chord);
