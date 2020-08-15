@@ -1,5 +1,5 @@
 import abcjs from "abcjs";
-import {Chord, generateNotes} from "./chord";
+import {Chord, generateNotes, getPitchStringFromIndex } from "./chord";
 
 const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 const COLOR_SELECT = "#00AA00";
@@ -210,22 +210,23 @@ const makeMusic = function () {
     // ensure the key signature drop down shows the correct value
     document.querySelector("select").value = KEY;
 
-    /* Populate the note range drop downs with allowable values. Note that it should not be possible
-    for an index_max to be less than an index_min, or vice versa. */
+    /* Populate the note range drop downs with allowable values. Note that our design does not permit
+    for a min index to be greater than a max index, or vice versa. Also note that we populate from 
+    greatest value to least for visual clarity. */
     let options = "";
-    for (let i = INDEX_TOP_MIN_CAP; i <= INDEX_TOP_MAX; i++) options += `<option value="${i}">${i}</option>`;
+    for (let i = INDEX_TOP_MAX; i >= INDEX_TOP_MIN_CAP; i--) options += `<option value="${i}">${getPitchStringFromIndex(i)}</option>`;
     document.querySelector(".note_top_min").innerHTML = options;
     document.querySelector(".note_top_min").value = INDEX_TOP_MIN;
     options = "";
-    for (let i = INDEX_TOP_MIN; i <= INDEX_TOP_MAX_CAP; i++) options += `<option value="${i}">${i}</option>`;
+    for (let i = INDEX_TOP_MAX_CAP; i >= INDEX_TOP_MIN; i--) options += `<option value="${i}">${getPitchStringFromIndex(i)}</option>`;
     document.querySelector(".note_top_max").innerHTML = options;
     document.querySelector(".note_top_max").value = INDEX_TOP_MAX;
     options = "";
-    for (let i = INDEX_BOT_MIN_CAP; i <= INDEX_BOT_MAX; i++) options += `<option value="${i}">${i}</option>`;
+    for (let i = INDEX_BOT_MAX; i >= INDEX_BOT_MIN_CAP; i--) options += `<option value="${i}">${getPitchStringFromIndex(i)}</option>`;
     document.querySelector(".note_bot_min").innerHTML = options;
     document.querySelector(".note_bot_min").value = INDEX_BOT_MIN;
     options = "";
-    for (let i = INDEX_BOT_MIN; i <= INDEX_BOT_MAX_CAP; i++) options += `<option value="${i}">${i}</option>`;
+    for (let i = INDEX_BOT_MAX_CAP; i >= INDEX_BOT_MIN; i--) options += `<option value="${i}">${getPitchStringFromIndex(i)}</option>`;
     document.querySelector(".note_bot_max").innerHTML = options;
     document.querySelector(".note_bot_max").value = INDEX_BOT_MAX;
 

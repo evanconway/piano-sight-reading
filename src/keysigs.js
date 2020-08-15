@@ -90,4 +90,4 @@ KEY_SIGNATURES.set("Bbm", makeScaleMinor("B", 10, 6));
 KEY_SIGNATURES.set("Ebm", makeScaleMinor("E", 3, 2));
 KEY_SIGNATURES.set("Abm", makeScaleMinor("A", 8, 5));
 
-export { KEY_SIGNATURES }
+export { KEY_SIGNATURES, LETTERS }

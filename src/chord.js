@@ -1,4 +1,4 @@
-import { KEY_SIGNATURES } from "./keysigs"
+import { KEY_SIGNATURES, LETTERS } from "./keysigs"
 
 // add all key signatures to key signature drop down
 let options = ""
@@ -127,6 +127,23 @@ const getPitchFromIndex = function(key, index) {
     return new Pitch(key, scaleDegree, register, orgIndex);
 }
 
+// returns a string of the pitch class and register equivalent of the given staff index
+const getPitchStringFromIndex = function(index) {
+    let register = 4;
+    if (index >= 0) {
+        while (index >= 7) {
+            index -= 7;
+            register++;
+        }
+    } else {
+        while (index < 0) {
+            index += 7;
+            register--;
+        }
+    }
+    return LETTERS[index] + register.toString();
+}
+
 /* returns an array of chord objects, each with the given duration, number of pitches, and 
 pitches between the min and max (inclusive) */
 const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitches = 1, duration = 12) {
@@ -181,4 +198,4 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
     return arr;
 }
 
-export { Chord, generateNotes}
+export { Chord, generateNotes, getPitchStringFromIndex }
