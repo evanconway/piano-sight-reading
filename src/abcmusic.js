@@ -25,6 +25,10 @@ let INDEX_TOP_MAX = 15; // all max/min indices are inclusive
 let INDEX_TOP_MIN = 0;
 let INDEX_BOT_MAX = 0;
 let INDEX_BOT_MIN = -14;
+const INDEX_TOP_MAX_CAP = 20;
+const INDEX_TOP_MIN_CAP = -5;
+const INDEX_BOT_MAX_CAP = 5;
+const INDEX_BOT_MIN_CAP = -20;
 
 let playCursor = 0;
 
@@ -148,7 +152,7 @@ const generateABC = function () {
         result += headerBot;
         result += lineBot + "\n";
     }
-    console.log(result);
+
     return result;
 }
 
@@ -199,23 +203,38 @@ const generateMidiTimingArr = function() {
         });
         index += e.duration;
     })
-    console.log(MIDI_TIMING_ARRAY);
+
     return MIDI_TIMING_ARRAY
 }
 
 const makeMusic = function () {
 
+    // ensure the key signature drop down shows the correct value
     document.querySelector("select").value = KEY;
 
-    document.querySelector(".note_top_max_label").innerHTML = TOP_MAX_LABEL + INDEX_TOP_MAX;
-    document.querySelector(".note_top_min_label").innerHTML = TOP_MIN_LABEL + INDEX_TOP_MIN;
-    document.querySelector(".note_bot_max_label").innerHTML = BOT_MAX_LABEL + INDEX_BOT_MAX;
-    document.querySelector(".note_bot_min_label").innerHTML = BOT_MIN_LABEL + INDEX_BOT_MIN;
+    // populate the note range drop downs with allowable values
+    let options = "";
+    for (let i = INDEX_TOP_MIN_CAP; i <= INDEX_TOP_MAX; i++) options += `<option value="${i}">${i}</option>`;
+    document.querySelector(".note_top_min").innerHTML = options;
+    document.querySelector(".note_top_min").value = INDEX_TOP_MIN;
+    options = "";
+    for (let i = INDEX_TOP_MIN; i <= INDEX_TOP_MAX_CAP; i++) options += `<option value="${i}">${i}</option>`;
+    document.querySelector(".note_top_max").innerHTML = options;
+    document.querySelector(".note_top_max").value = INDEX_TOP_MAX;
+    options = "";
+    for (let i = INDEX_BOT_MIN_CAP; i <= INDEX_BOT_MAX; i++) options += `<option value="${i}">${i}</option>`;
+    document.querySelector(".note_bot_min").innerHTML = options;
+    document.querySelector(".note_bot_min").value = INDEX_BOT_MIN;
+    options = "";
+    for (let i = INDEX_BOT_MIN; i <= INDEX_BOT_MAX_CAP; i++) options += `<option value="${i}">${i}</option>`;
+    document.querySelector(".note_bot_max").innerHTML = options;
+    document.querySelector(".note_bot_max").value = INDEX_BOT_MAX;
 
     // limit number of notes based on duration
     if (INDEX_TOP_MAX - INDEX_TOP_MIN < NUMBER_TOP - 1) NUMBER_TOP = INDEX_TOP_MAX - INDEX_TOP_MIN + 1;
     if (INDEX_BOT_MAX - INDEX_BOT_MIN < NUMBER_BOT - 1) NUMBER_BOT = INDEX_BOT_MAX - INDEX_BOT_MIN + 1;
 
+    // generate notes
     NOTES_TOP = generateNotes(KEY, INDEX_TOP_MIN, INDEX_TOP_MAX, NUMBER_TOP, DURATION_TOP);
     NOTES_BOT = generateNotes(KEY, INDEX_BOT_MIN, INDEX_BOT_MAX, NUMBER_BOT, DURATION_BOT);
 
@@ -243,11 +262,15 @@ const makeMusic = function () {
     cursorSet(0);
 }
 
-document.querySelector("select").addEventListener("change", e => {
+// UI element "wiring"
+
+// key signature drop down
+document.querySelector(".keys").addEventListener("change", e => {
     KEY = e.target.value;
     makeMusic()
 })
 
+// note duration buttons
 document.querySelector(".duration_top").addEventListener("click", () => {
     DURATION_TOP /= 2;
     if (DURATION_TOP < 3) DURATION_TOP = BASE_DURATION;
@@ -259,6 +282,7 @@ document.querySelector(".duration_bot").addEventListener("click", () => {
     makeMusic();
 })
 
+// number of note buttons
 document.querySelector(".number_top").addEventListener("click", () => {
     NUMBER_TOP++;
     if (NUMBER_TOP > 4) NUMBER_TOP = 1;
@@ -270,45 +294,24 @@ document.querySelector(".number_bot").addEventListener("click", () => {
     makeMusic();
 })
 
-document.querySelector(".note_top_max_raise").addEventListener("click", () => {
-    INDEX_TOP_MAX++;
+// top staff range drop downs
+document.querySelector(".note_top_min").addEventListener("change", e => {
+    INDEX_TOP_MIN = parseInt(e.target.value);
     makeMusic();
 })
-document.querySelector(".note_top_max_lower").addEventListener("click", () => {
-    if (INDEX_TOP_MAX > INDEX_TOP_MIN) {
-        INDEX_TOP_MAX--;
-        makeMusic();
-    }
-})
-document.querySelector(".note_top_min_raise").addEventListener("click", () => {
-    if (INDEX_TOP_MIN < INDEX_TOP_MAX) {
-        INDEX_TOP_MIN++;
-        makeMusic();
-    }
-})
-document.querySelector(".note_top_min_lower").addEventListener("click", () => {
-    INDEX_TOP_MIN--;
+document.querySelector(".note_top_max").addEventListener("change", e => {
+    INDEX_TOP_MAX = parseInt(e.target.value);
     makeMusic();
 })
-document.querySelector(".note_bot_max_raise").addEventListener("click", () => {
-    INDEX_BOT_MAX++;
+document.querySelector(".note_bot_min").addEventListener("change", e => {
+    INDEX_BOT_MIN = parseInt(e.target.value);
     makeMusic();
 })
-document.querySelector(".note_bot_max_lower").addEventListener("click", () => {
-    if (INDEX_BOT_MAX > INDEX_BOT_MIN) {
-        INDEX_BOT_MAX--;
-        makeMusic();
-    }
-})
-document.querySelector(".note_bot_min_raise").addEventListener("click", () => {
-    if (INDEX_BOT_MIN < INDEX_BOT_MAX) {
-        INDEX_BOT_MIN++;
-        makeMusic();
-    }
-})
-document.querySelector(".note_bot_min_lower").addEventListener("click", () => {
-    INDEX_BOT_MIN--;
+document.querySelector(".note_bot_max").addEventListener("change", e => {
+    INDEX_BOT_MAX = parseInt(e.target.value);
     makeMusic();
 })
+
+
 
 export { cursorAdv, cursorBck, playedCorrect, makeMusic }

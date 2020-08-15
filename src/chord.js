@@ -5,7 +5,7 @@ let options = ""
 KEY_SIGNATURES.forEach((val, key) => {
     options += `<option value="${key}">${key}</option>`;
 })
-const KEY_MENU = document.querySelector("select");
+const KEY_MENU = document.querySelector(".keys");
 KEY_MENU.innerHTML = options;
 
 class Pitch {
@@ -156,8 +156,7 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
 
         // we declare our pitch options by making an array of all valid staff indices
         let options = new Array(indMax - indMin + 1);
-        for (let p = 0; p < options.length; p++) options[p] = indMin + p;
-        console.log(options);
+        for (let p = 0; p < options.length; p++) options[p] = (indMin + p);
 
         for (let j = 0; j < numOfPitches; j++) {
             /* We randomly choose an index from the options array, create a pitch from it,
@@ -195,6 +194,7 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
             // console.log("Options after delete bottom");
             // console.log(options);
         }
+
         arr.push(chord);
     }
     return arr;
