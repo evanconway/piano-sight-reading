@@ -279,15 +279,14 @@ const makeMusic = function () {
         staffwidth: 1100,
     })
 
+    /* This is a hack to remove the build-in red highlighting effect. After the abcjs.renderAbc
+    function creates the html, the rect tags are setup to listen for click events. When clicked, 
+    they color the path tag (note) beneath them red. Cloned tags do not retain the event listeners.
+    So by replacing each tag with a clone of itself, we remove those listeners. */
     Array.from(document.querySelectorAll("rect")).forEach(rect => {
         let clone = rect.cloneNode(true);
         rect.parentNode.replaceChild(clone, rect);
     })
-
-    /*
-    var el = document.getElementById('el-id'), elClone = el.cloneNode(true);
-    el.parentNode.replaceChild(elClone, el);
-    */
 
 	/* We need to be able to refer to the html to change the color of notes. We do that
 	with query selectors. The generateABC function does more than create strings. It also
