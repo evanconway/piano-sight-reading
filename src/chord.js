@@ -59,18 +59,54 @@ class Pitch {
 }
 
 class Chord { 
-    constructor(duration) {
+    constructor(key = "C", indMin = 0, indMax = 15, numOfPitches = 1, duration = 12) {
         this.pitches = []; // pitches are pitch objects
         /* We should elaborate on duration here. Duration is actually a multiplier
         of DEFAULT_DURATION in the abcjs file. Recall that DEFAULT_DURATION is 
         actually the denominator of our default note length in abcjs. So if our
-        DEFAULT_DURATION is 48, a quarter note should have a duration of 12, and
+        DEFAULT_DURATION is 48, a quarter note should have a duration of 12, an
         eighth note a duration of 6, and a whole note a duration of 48. */
         this.duration = duration; // the ABC modifier for the default length
         this.path = null; // reference to the html element of the note
-        this.timingIndex = null; // index this note exists in the timing array
+        this.timingIndex = null; // index this chord exists in the timing array
         this.staffIndexLowest = null; // for determining pitch limits in multi pitch chords
         this.staffIndexHighest = null; // same as above
+
+        // we declare our pitch options by making an array of all valid staff indices
+        let options = new Array(indMax - indMin + 1);
+        for (let p = 0; p < options.length; p++) options[p] = (indMin + p);
+
+        for (let i = 0; i < numOfPitches; i++) {
+            /* We randomly choose an index from the options array, create a pitch from it,
+            add it to the chord, and remove that pitch from our options. */
+            let choiceIndex = Math.floor(Math.random() * options.length)
+            let choice = options[choiceIndex]
+            this.addPitch(new Pitch(key, choice));
+            options.splice(choiceIndex, 1);
+
+            /* In order to prevent the music from being unplayable, we have to remove 
+            pitch options that are too far away from pitches already in our chord. We've
+            chosen an octave to be the maximum span of a chord. First, we'll remove all
+            options that are more an than octave higher than the lowest note. */
+            let remove = this.staffIndexLowest + 7;
+            let index = 0;
+            while (index < options.length && options[index] <= remove) index++;
+            /* The index is now at the first position where the option is an invalid
+            for the remainder of the array. Since splice deletes n elements, we have 
+            to use the number of elements remaining in the array. */
+            options.splice(index, options.length - index);
+
+            // now we remove the low notes with the same logic
+            remove = this.staffIndexHighest - 7;
+            index = options.length - 1;
+            while (index >= 0 && options[index] >= remove) index--;
+            /* Moving backwards, the index is now at the position of the first element
+            that is less than remove. Since the splice function takes a length, and not
+            an end index, we need to add 1 to the index for it to work. For example, 
+            let's say we need to remove the first 3 values. This means the index would 
+            stopped at 2, so it must be increased to 3 for the splice to work. */
+            options.splice(0, index + 1);
+        }        
     }
 
     addPitch(pitch) {
@@ -145,46 +181,10 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
     const arr = []; // the array of chords
 
     for (let i = 0; i < noteNum; i++) {
-        let chord = new Chord(duration);
-
-        // we declare our pitch options by making an array of all valid staff indices
-        let options = new Array(indMax - indMin + 1);
-        for (let p = 0; p < options.length; p++) options[p] = (indMin + p);
-
-        for (let j = 0; j < numOfPitches; j++) {
-            /* We randomly choose an index from the options array, create a pitch from it,
-            add it to the chord, and remove that pitch from our options. */
-            let choiceIndex = Math.floor(Math.random() * options.length)
-            let choice = options[choiceIndex]
-            chord.addPitch(new Pitch(key, choice));
-            options.splice(choiceIndex, 1);
-
-            /* In order to prevent the music from being unplayable, we have to remove 
-            pitch options that are too far away from pitches already in our chord. We've
-            chosen an octave to be the maximum span of a chord. First, we'll remove all
-            options that are more an than octave higher than the lowest note. */
-            let remove = chord.staffIndexLowest + 7;
-            let index = 0;
-            while (index < options.length && options[index] <= remove) index++;
-            /* The index is now at the first position where the option is an invalid
-            for the remainder of the array. Since splice deletes n elements, we have 
-            to use the number of elements remaining in the array. */
-            options.splice(index, options.length - index);
-
-            // now we remove the low notes with the same logic
-            remove = chord.staffIndexHighest - 7;
-            index = options.length - 1;
-            while (index >= 0 && options[index] >= remove) index--;
-            /* Moving backwards, the index is now at the position of the first element
-            that is less than remove. Since the splice function takes a length, and not
-            an end index, we need to add 1 to the index for it to work. For example, 
-            let's say we need to remove the first 3 values. This means the index would 
-            stopped at 2, so it must be increased to 3 for the splice to work. */
-            options.splice(0, index + 1);
-        }
-
+        let chord = new Chord(key, indMin, indMax, numOfPitches, duration);
         arr.push(chord);
     }
+    
     return arr;
 }
 
