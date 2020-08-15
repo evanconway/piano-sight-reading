@@ -20,7 +20,7 @@ document.querySelector(".duration_top").innerHTML = durations;
 document.querySelector(".duration_bot").innerHTML = durations;
 
 // music consts
-const TITLE = "Sight Reading";
+const TITLE = "";
 const METER = "C";
 let KEY = "E";
 let NOTES_TOP = [];
