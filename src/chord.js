@@ -9,7 +9,7 @@ const KEY_MENU = document.querySelector(".keys");
 KEY_MENU.innerHTML = options;
 
 class Pitch {
-    constructor(key, staffIndex) {
+    constructor(key, staffIndex, alter = 0) {
         this.key = key;
         this.staffIndex = staffIndex;
 
@@ -44,18 +44,74 @@ class Pitch {
             this.scaleDegree++;
         }
 
-        /* The midi value stored in the key signatures map is only the correct
-        pitch class. We now need to get the correct midi value using our newly
-        calculated register and scale degree. */
+        /* The midi value stored in the key signatures map is only the correct pitch class. We now 
+        need to get the correct midi value using our newly calculated register and scale degree. 
+        Recall each element in a scale is an array, the first element being the letter, the second 
+        being the base midi value. */
         this.midi = KEY_SIGNATURES.get(key).get(this.scaleDegree)[1];
         for (let i = 0; i <= this.register; i++) this.midi += 12;
 
-        /* Similar to the midi value, we have to create the correct ABCjs string
-        using the given register. */
-        this.string = KEY_SIGNATURES.get(key).get(this.scaleDegree)[0];
+        /* Now we make two strings for the pitch. One is the string that is given to the ABCjs
+        render function, the other is the default accidental of the pitch. We need to know the 
+        accidental so that if we mark a pitch as raised or lowered, we know what accidental to 
+        apply. Note that we'll be using the ABCjs characters for sharp and flat. For example, 
+        the raised root in C major uses a sharp instead of a natural (=C -> ^C).  
+        But the raised root in Bb major uses a natural instead of a flat (_B -> =B). */
+
+        /* Recall each element in a scale is an array, the first element being the letter, the
+        second being the base midi value. */
+        let letter = KEY_SIGNATURES.get(key).get(this.scaleDegree)[0];
+
+        /* We make the ABCjs string by appending the correct register mark the correct number
+        of times. */
+        this.string = letter;
         if (this.register < 4) for (let i = 4; i > this.register; i--) this.string += ",";
         else for (let i = 4; i < this.register; i++) this.string += "'";
+
+        /* We make the string with the true accidental by adding the keys accidental if letter
+        is included in the scales "accidentals" array. */
+        this.defaultAccidental = "";
+        let acc_arr = KEY_SIGNATURES.get(key).get("accidentals");
+        if (acc_arr.includes(letter)) this.defaultAccidental += acc_arr[acc_arr.length - 1];
+        else this.defaultAccidental += "="; // default is a natural
+
+        /* Finally, we'll make any given alterations to the note. This is either raising or lowering
+        the pitch. A positive number means raising the pitch, negative means lower, and 0 means no
+        alteration. Note that we must change the midi value and string for our other code to work. */
+        // raise pitch
+        if (alter > 0) {
+            this.midi += 1;
+            if (this.defaultAccidental === "_") this.string = "=" + this.string;
+            else if (this.defaultAccidental === "=") this.string = "^" + this.string;
+            else this.string = "^^" + this.string;
+        }
+        // lower pitch
+        if (alter < 0) {
+            this.midi -= 1;
+            if (this.defaultAccidental === "^") this.string = "=" + this.string;
+            else if (this.defaultAccidental === "=") this.string = "_" + this.string;
+            else this.string = "__" + this.string;
+        }
     }
+}
+
+// returns a string of the pitch class and register equivalent of the given staff index
+const getPitchStringFromIndex = function (index) {
+    let register = 4;
+    if (index >= 0) {
+        while (index >= 7) {
+            index -= 7;
+            register++;
+        }
+    } else {
+        while (index < 0) {
+            index += 7;
+            register--;
+        }
+    }
+    let string = LETTERS[index] + register.toString();
+    if (string === "C4") string += " *";
+    return string;
 }
 
 class Chord { 
@@ -132,7 +188,7 @@ class Chord {
     }
 
     getABCString() {
-        if (this.pitches.length === 0) return "x" + this.duration.toString(); // maybe we could use length 0 to represent rests??
+        if (this.pitches.length === 0) return "x" + this.duration.toString(); // no pitches means invisible rest
         if (this.pitches.length === 1) return this.pitches[0].string + this.duration.toString();
         let result = "[";
         this.pitches.forEach(e => result += e.string);
@@ -151,25 +207,6 @@ class Chord {
     }
 }
 
-// returns a string of the pitch class and register equivalent of the given staff index
-const getPitchStringFromIndex = function(index) {
-    let register = 4;
-    if (index >= 0) {
-        while (index >= 7) {
-            index -= 7;
-            register++;
-        }
-    } else {
-        while (index < 0) {
-            index += 7;
-            register--;
-        }
-    }
-    let string = LETTERS[index] + register.toString();
-    if (string === "C4") string += " *";
-    return string;
-}
-
 /* returns an array of chord objects, each with the given duration, number of pitches, and 
 pitches between the min and max (inclusive) */
 const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitches = 1, duration = 12) {
@@ -184,8 +221,8 @@ const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitche
         let chord = new Chord(key, indMin, indMax, numOfPitches, duration);
         arr.push(chord);
     }
-    
+
     return arr;
 }
 
-export { Chord, generateNotes, getPitchStringFromIndex }
+export { generateNotes, getPitchStringFromIndex }
