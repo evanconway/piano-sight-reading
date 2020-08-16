@@ -114,6 +114,89 @@ const getPitchStringFromIndex = function (index) {
     return string;
 }
 
+// returns all valid staff indicies for a given harmony/chord and min/max indicies
+const getChordOptions = function (key = "C", min = -15, max = 15, numeral = null) {
+
+    // get an equivalent int from the numeral
+    let chordInt = null;
+    if (numeral === "I" || numeral === "i") chordInt = 1;
+    if (numeral === "II" || numeral === "ii") chordInt = 2;
+    if (numeral === "III" || numeral === "iiii") chordInt = 3;
+    if (numeral === "IV" || numeral === "iv") chordInt = 4;
+    if (numeral === "V" || numeral === "v") chordInt = 5;
+    if (numeral === "VI" || numeral === "vi") chordInt = 6;
+    if (numeral === "VII" || numeral === "vii") chordInt = 7;
+
+    /* If chordInt is still null, then no valid harmony was given. In that case the
+    pitch options will simply be all indices between min and max inclusive. */
+    if (chordInt === null) {
+        let options = new Array(max - min + 1);
+        for (let i = 0; i < options.length; i++) options[i] = i + min;
+        return options;
+    }
+
+    /* However if a valid harmony was given, we can begin finding the options that
+    fit within the harmony. First, we construct an array of valid scale degrees. Recall 
+    that all elements in the chord are separated by a third, hence the plus 2. */
+    let arr = [];
+    arr[0] = chordInt; // assign root of chord.
+    arr[1] = arr[0] + 2;
+    arr[2] = arr[1] + 2;
+    arr.forEach((e, i) => {
+        if (e > 7) e -= 7; // wrap back
+        arr[i] = e;
+    })
+
+    /* Now we convert the scale degrees into staff indicies. Recall that each key
+    includes the base staff index of its root (0 for C, 1 for D, 4 for G...). To do
+    this we decrease each scale degree by one so they can be treated like 0 based 
+    indices. Now consider that the staff root of a key is also the distance that 
+    key is from 0. For example C has staff root 0, and is 0 away from 0. F has 
+    staff root 3, and is 3 away from 0. Since the values in arr are now 0 based, we 
+    can add the staff root to each to get them into the correct key. Finally, we 
+    wrap any values 7 or greater back to 0 to keep things in base staff index. */
+    let staffRoot = KEY_SIGNATURES.get(key).get("staff_root");
+    arr.forEach((e, i) => {
+        e -= 1;
+        e += staffRoot;
+        if (e >= 7) e -=7;
+        arr[i] = e;
+    })
+
+    /* Before we can generate notes, we have to move all indices to their register
+    equivalent just above min. */
+    arr.forEach((e, i) => {
+        if (e > min) {
+            while (e >= min + 7) e -= 7;
+        }
+        if (e < min) {
+            while (e <= min) e += 7;
+        }
+        arr[i] = e;
+    })
+
+    /* Now we sort the array. The reason is because our min indices are not necessarily
+    in the correct chord order. Imagine we're making a one chord in C major, and our min
+    staff index is 1. At this point arr is going to containt: [7, 2, 4]. Although these 
+    are the correct indices, this is not the order we should start choosing options in.
+    For that the order should be [2, 4, 7]. */
+    arr.sort();
+
+    /* Now we can finally generate our options. To do this we add elements from arr in 
+    order, but increase the value by an octave each time, until we reach a value larger
+    than max. */
+    let options = [];
+    let index = 0;
+    while (arr[index] <= max) {
+        options.push(arr[index]);
+        arr[index] += 7;
+        index++;
+        if (index >= arr.length) index = 0;
+    }
+
+    return options;
+}
+
 class Chord { 
     constructor(key = "C", indMin = 0, indMax = 15, numOfPitches = 1, duration = 12) {
         this.pitches = []; // pitches are pitch objects
@@ -129,8 +212,7 @@ class Chord {
         this.staffIndexHighest = null; // same as above
 
         // we declare our pitch options by making an array of all valid staff indices
-        let options = new Array(indMax - indMin + 1);
-        for (let p = 0; p < options.length; p++) options[p] = (indMin + p);
+        let options = getChordOptions(key, indMin, indMax);
 
         for (let i = 0; i < numOfPitches; i++) {
             /* We randomly choose an index from the options array, create a pitch from it,
