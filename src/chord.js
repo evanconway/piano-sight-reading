@@ -1,4 +1,4 @@
-import { KEY_SIGNATURES, LETTERS } from "./keysigs"
+import { KEY_SIGNATURES, LETTERS, CHORDS } from "./keysigs"
 
 // add all key signatures to key signature drop down
 let options = ""
@@ -110,22 +110,29 @@ const getPitchStringFromIndex = function (index) {
         }
     }
     let string = LETTERS[index] + register.toString();
+    if (string === "F5") string += " -";
+    if (string === "E4") string += " -";
     if (string === "C4") string += " *";
+    if (string === "A3") string += " -";
+    if (string === "G2") string += " -";
     return string;
 }
 
 // returns all valid staff indicies for a given harmony/chord and min/max indicies
-const getChordOptions = function (key = "C", min = -15, max = 15, numeral = null) {
+const getChordOptions = function (key = "C", min = -15, max = 15, harmony = null) {
 
-    // get an equivalent int from the numeral
+    /* Get an equivalent int from the numeral. Note that we're not worrying about
+    chord quality right now. */
     let chordInt = null;
-    if (numeral === "I" || numeral === "i") chordInt = 1;
-    if (numeral === "II" || numeral === "ii") chordInt = 2;
-    if (numeral === "III" || numeral === "iiii") chordInt = 3;
-    if (numeral === "IV" || numeral === "iv") chordInt = 4;
-    if (numeral === "V" || numeral === "v") chordInt = 5;
-    if (numeral === "VI" || numeral === "vi") chordInt = 6;
-    if (numeral === "VII" || numeral === "vii") chordInt = 7;
+    if (harmony !== null) {
+        if (harmony.startsWith("I") || harmony.startsWith("i")) chordInt = 1;
+        if (harmony.startsWith("II") || harmony.startsWith("ii")) chordInt = 2;
+        if (harmony.startsWith("III") || harmony.startsWith("iii")) chordInt = 3;
+        if (harmony.startsWith("IV") || harmony.startsWith("iv")) chordInt = 4;
+        if (harmony.startsWith("V") || harmony.startsWith("v")) chordInt = 5;
+        if (harmony.startsWith("VI") || harmony.startsWith("vi")) chordInt = 6;
+        if (harmony.startsWith("VII") || harmony.startsWith("vii")) chordInt = 7;
+    }
 
     /* If chordInt is still null, then no valid harmony was given. In that case the
     pitch options will simply be all indices between min and max inclusive. */
@@ -198,7 +205,7 @@ const getChordOptions = function (key = "C", min = -15, max = 15, numeral = null
 }
 
 class Chord { 
-    constructor(key = "C", indMin = 0, indMax = 15, numOfPitches = 1, duration = 12) {
+    constructor(key = "C", indMin = 0, indMax = 15, numOfPitches = 1, duration = 12, harmony = null) {
         this.pitches = []; // pitches are pitch objects
         /* We should elaborate on duration here. Duration is actually a multiplier
         of DEFAULT_DURATION in the abcjs file. Recall that DEFAULT_DURATION is 
@@ -212,9 +219,9 @@ class Chord {
         this.staffIndexHighest = null; // same as above
 
         // we declare our pitch options by making an array of all valid staff indices
-        let options = getChordOptions(key, indMin, indMax);
+        let options = getChordOptions(key, indMin, indMax, harmony);
 
-        for (let i = 0; i < numOfPitches; i++) {
+        for (let i = 0; i < numOfPitches && options.length > 0; i++) {
             /* We randomly choose an index from the options array, create a pitch from it,
             add it to the chord, and remove that pitch from our options. */
             let choiceIndex = Math.floor(Math.random() * options.length)
@@ -289,22 +296,64 @@ class Chord {
     }
 }
 
-/* returns an array of chord objects, each with the given duration, number of pitches, and 
-pitches between the min and max (inclusive) */
-const generateNotes = function (key = "C", indMin = 0, indMax =  15, numOfPitches = 1, duration = 12) {
+let harmony = "I";
+/* returns a 2D array of chord objects, each with the given duration, number of pitches, and 
+pitches between the min and max (inclusive) for the respective staff. */
+const generateNotes = function (key = "C",
+                                useHarmony = true,
+                                resetHarmony = false, // if we want to start at "I", set true
+                                topMin = 0, 
+                                topMax =  15, 
+                                topNumOfPitches = 1, 
+                                topDuration = 12,
+                                botMin = -15,
+                                botMax = 0,
+                                botNumOfPitches = 1,
+                                botDuration = 24) {
 
+    // the chord arrays
     /* I straight up forgot how this line works! I know that it only works for 4/4 timing, and the
-    5 is for 5 lines of music. Must revist and make work with other time signatures. */
-    const noteNum = 5 * 16 / (duration / 12);
+    5 is for 5 lines of music. Must revist and make work with other time signatures. */ 
+    const arrTop = new Array(5 * 16 / (topDuration / 12));
+    const arrBot = new Array(5 * 16 / (botDuration / 12));
 
-    const arr = []; // the array of chords
+    if (useHarmony) {
+        /* Notice that the variable "harmony" is delcared outside of the function, this is so that we can
+        remember what the last harmony generated was for the last function call. That way we can continue 
+        our progression where we left off at the end of a page. But we can also reset it if desired. */
+        if (resetHarmony) harmony = "I";
 
-    for (let i = 0; i < noteNum; i++) {
-        let chord = new Chord(key, indMin, indMax, numOfPitches, duration);
-        arr.push(chord);
+        /* By our design, chords will be generated so that if one staff has a quicker duration than the
+        other, it will maintain the same chord as the slower staff until that harmony is over. For example,
+        if the bottom staff is whole notes, the top staff is quarter notes, and the bottom is playing the
+        "I" chord, then all 4 chords in the top staff will be "I". Since longer duration means less elements 
+        in the chord array, we will generate the smaller array first. */
+        if (arrTop.length < arrBot.length) {
+            // generate top array first
+            // "diff" determines how many of each harmony we should place in the bot staff
+            let diff = topDuration / botDuration;
+            for (let i = 0; i < arrTop.length; i++) {
+                arrTop[i] = new Chord(key, topMin, topMax, topNumOfPitches, topDuration, harmony);
+                for (let k = 0; k < diff; k++) arrBot[i * diff + k] = new Chord(key, botMin, botMax, botNumOfPitches, botDuration, harmony);
+                let harmony_arr = CHORDS.get(harmony);
+                harmony = harmony_arr[Math.floor(Math.random() * harmony_arr.length)];
+            }
+        } else {
+            /* Same logic as above, but top and bot reversed. Notice that if the durations are equal, this
+            is the code used, and it still works since diff will be "1". */
+            let diff = botDuration / topDuration;
+            for (let i = 0; i < arrBot.length; i++) {
+                arrBot[i] = new Chord(key, botMin, botMax, botNumOfPitches, botDuration, harmony);
+                for (let k = 0; k < diff; k++) arrTop[i * diff + k] = new Chord(key, topMin, topMax, topNumOfPitches, topDuration, harmony);
+                let harmony_arr = CHORDS.get(harmony);
+                harmony = harmony_arr[Math.floor(Math.random() * harmony_arr.length)];
+            }
+        }
+    } else {
+        for (let i = 0; i < arrTop.length; i++) arrTop[i] = new Chord(key, topMin, topMax, topNumOfPitches, topDuration);
+        for (let i = 0; i < arrBot.length; i++) arrBot[i] = new Chord(key, botMin, botMax, botNumOfPitches, botDuration);
     }
-
-    return arr;
+    return [arrTop, arrBot];
 }
 
 export { generateNotes, getPitchStringFromIndex }

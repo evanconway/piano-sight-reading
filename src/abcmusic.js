@@ -21,8 +21,8 @@ document.querySelector(".duration_bot").innerHTML = durations;
 
 // music consts
 const TITLE = "";
-const METER = "C";
-let KEY = "E";
+const METER = "4/4";
+let KEY = "C";
 let NOTES_TOP = [];
 let NOTES_BOT = [];
 const MEASURES_PER_LINE = 4;
@@ -32,14 +32,16 @@ const NUMBER_MAX = 4;
 const NUMBER_MIN = 0;
 let NUMBER_TOP = 3;
 let NUMBER_BOT = 1;
-let INDEX_TOP_MAX = 15; // all max/min indices are inclusive
+let INDEX_TOP_MAX = 11; // all max/min indices are inclusive
 let INDEX_TOP_MIN = 0;
 let INDEX_BOT_MAX = 0;
-let INDEX_BOT_MIN = -14;
+let INDEX_BOT_MIN = -11;
 const INDEX_TOP_MAX_CAP = 20;
 const INDEX_TOP_MIN_CAP = -5;
 const INDEX_BOT_MAX_CAP = 5;
 const INDEX_BOT_MIN_CAP = -20;
+let USE_HARMONY = false;
+const HARMONY_BUTTON = document.querySelector(".harmony");
 
 let playCursor = 0;
 
@@ -163,7 +165,6 @@ const generateABC = function () {
         result += headerBot;
         result += lineBot + "\n";
     }
-    console.log(result);
     return result;
 }
 
@@ -217,7 +218,7 @@ const generateMidiTimingArr = function() {
     return MIDI_TIMING_ARRAY
 }
 
-const makeMusic = function () {
+const makeMusic = function (resetHarmony = true) {
 
     // ensure the key signature drop down shows the correct value
     document.querySelector(".keys").value = KEY;
@@ -265,8 +266,9 @@ const makeMusic = function () {
     document.querySelector(".number_bot").value = NUMBER_BOT;
 
     // generate notes
-    NOTES_TOP = generateNotes(KEY, INDEX_TOP_MIN, INDEX_TOP_MAX, NUMBER_TOP, DURATION_TOP);
-    NOTES_BOT = generateNotes(KEY, INDEX_BOT_MIN, INDEX_BOT_MAX, NUMBER_BOT, DURATION_BOT);
+    let notes = generateNotes(KEY, USE_HARMONY, resetHarmony, INDEX_TOP_MIN, INDEX_TOP_MAX, NUMBER_TOP, DURATION_TOP, INDEX_BOT_MIN, INDEX_BOT_MAX, NUMBER_BOT, DURATION_BOT);
+    NOTES_TOP = notes[0];
+    NOTES_BOT = notes[1];
 
 	/* I'm going to link the documentation right here: 
 	https://paulrosen.github.io/abcjs/visual/render-abc-options.html
@@ -345,6 +347,19 @@ document.querySelector(".note_bot_min").addEventListener("change", e => {
 })
 document.querySelector(".note_bot_max").addEventListener("change", e => {
     INDEX_BOT_MAX = parseInt(e.target.value);
+    makeMusic();
+})
+
+// harmony button
+const harmonyButtonText = function() {
+    if (USE_HARMONY) HARMONY_BUTTON.innerHTML = "Use Harmony: ON";
+    else HARMONY_BUTTON.innerHTML = "Use Harmony: OFF";
+}
+harmonyButtonText();
+
+HARMONY_BUTTON.addEventListener("click", e => {
+    USE_HARMONY = !USE_HARMONY;
+    harmonyButtonText();
     makeMusic();
 })
 

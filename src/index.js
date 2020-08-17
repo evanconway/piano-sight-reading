@@ -17,7 +17,7 @@ const notePlayed = function(midi) {
 	playAdd(midi);
 	if (playedCorrect(MIDI_PLAYED)) {
 		let adv = cursorAdv();
-		if (!adv) makeMusic();
+		if (!adv) makeMusic(false);
 		MIDI_PLAYED.length = 0;
 	}
 }

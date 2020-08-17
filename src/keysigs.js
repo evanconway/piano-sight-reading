@@ -103,4 +103,16 @@ KEY_SIGNATURES.set("Bbm", makeScaleMinor("B", 10, 6, FLATS, 5));
 KEY_SIGNATURES.set("Ebm", makeScaleMinor("E", 3, 2, FLATS, 6));
 KEY_SIGNATURES.set("Abm", makeScaleMinor("A", 8, 5, FLATS, 7));
 
-export { KEY_SIGNATURES, LETTERS }
+// HARMONY
+/* The following chord progression rules are used for random generization. Note that 
+for know we are only considering the major keys. */
+const CHORDS = new Map();
+CHORDS.set("I", ["I", "ii", "iii", "IV", "V", "vi", "viio"]);
+CHORDS.set("ii", ["viio", "V"]);
+CHORDS.set("iii", ["vi"]);
+CHORDS.set("IV", ["ii", "viio", "V"]);
+CHORDS.set("V", ["I", "vi"]);
+CHORDS.set("vi", ["IV", "ii"]);
+CHORDS.set("viio", ["I"]);
+
+export { KEY_SIGNATURES, LETTERS, CHORDS }
