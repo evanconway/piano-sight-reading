@@ -15,7 +15,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "scripts": {
-    "start": "webpack-dev-server --history-api-fallback --inline --progress"
+    "start": "webpack-dev-server --history-api-fallback --inline --progress",
+    "build": "webpack --config webpack.config.js"
   },
   "dependencies": {
     "abcjs": "^5.12.0",
