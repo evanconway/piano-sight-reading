@@ -79,8 +79,16 @@ class Pitch {
         the pitch. A positive number means raising the pitch, negative means lower, and 0 means no
         alteration. Note that we must change the midi value and string for our other code to work. 
         Alterations are determined by the chord quality. For example, in the minor key, the V chord 
-        will have it's third raised. */
+        will have it's third raised. This chunk of code determines whether or not the pitch should
+        be raised or lowered based on the given harmony, and it's member in the chord. */
         let alter = 0;
+        // minor key alterations
+        if (harmony !== null && key.endsWith("m")) {
+            if (harmony === "V" && this.scaleDegree === 7) alter = 1;
+            if (harmony === "viio" && this.scaleDegree === 7) alter = 1;
+        }
+
+        // Here we make the alteration, if any was found.
         // raise pitch
         if (alter > 0) {
             this.midi += 1;
