@@ -33,7 +33,7 @@ function add_msg_handlers(controllers) {
 	}
 }
 
-function onfullfilled(midiaccess, options) {
+function onfullfilled(midiaccess) {
 	let controllers = midiaccess.inputs.values()
 	add_msg_handlers(controllers);
 	midiaccess.onstatechange = () => add_msg_handlers(controllers);

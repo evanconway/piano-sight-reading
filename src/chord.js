@@ -1,4 +1,4 @@
-import { KEY_SIGNATURES, LETTERS, CHORDS } from "./keysigs"
+import { KEY_SIGNATURES, LETTERS, CHORDS_MAJOR, CHORDS_MINOR } from "./keysigs"
 
 // add all key signatures to key signature drop down
 let options = ""
@@ -9,7 +9,7 @@ const KEY_MENU = document.querySelector(".keys");
 KEY_MENU.innerHTML = options;
 
 class Pitch {
-    constructor(key, staffIndex, alter = 0) {
+    constructor(key, staffIndex, harmony = null) {
         this.key = key;
         this.staffIndex = staffIndex;
 
@@ -77,7 +77,10 @@ class Pitch {
 
         /* Finally, we'll make any given alterations to the note. This is either raising or lowering
         the pitch. A positive number means raising the pitch, negative means lower, and 0 means no
-        alteration. Note that we must change the midi value and string for our other code to work. */
+        alteration. Note that we must change the midi value and string for our other code to work. 
+        Alterations are determined by the chord quality. For example, in the minor key, the V chord 
+        will have it's third raised. */
+        let alter = 0;
         // raise pitch
         if (alter > 0) {
             this.midi += 1;
@@ -226,7 +229,7 @@ class Chord {
             add it to the chord, and remove that pitch from our options. */
             let choiceIndex = Math.floor(Math.random() * options.length)
             let choice = options[choiceIndex]
-            this.addPitch(new Pitch(key, choice));
+            this.addPitch(new Pitch(key, choice, harmony));
             options.splice(choiceIndex, 1);
 
             /* In order to prevent the music from being unplayable, we have to remove 
@@ -296,7 +299,7 @@ class Chord {
     }
 }
 
-let harmony = "I";
+let harmony = null;
 /* returns a 2D array of chord objects, each with the given duration, number of pitches, and 
 pitches between the min and max (inclusive) for the respective staff. */
 const generateNotes = function (key = "C",
@@ -318,10 +321,19 @@ const generateNotes = function (key = "C",
     const arrBot = new Array(5 * 16 / (botDuration / 12));
 
     if (useHarmony) {
-        /* Notice that the variable "harmony" is delcared outside of the function, this is so that we can
+        /* Our system only accounts for major and minor keys in traditional western harmony. Before we
+        can generate chords, we must determine if the key is major or minor. */
+        let chords = CHORDS_MAJOR;
+        if (key.endsWith("m")) chords = CHORDS_MINOR;
+
+        /* Notice that the variable "harmony" is declared outside of the function, this is so that we can
         remember what the last harmony generated was for the last function call. That way we can continue 
-        our progression where we left off at the end of a page. But we can also reset it if desired. */
-        if (resetHarmony) harmony = "I";
+        our progression where we left off at the end of a page. But we can also reset it if desired. 
+        However we need to first initialize it if we haven't given it a value yet.*/
+        if (harmony === null || resetHarmony) {
+            harmony = "I"
+            if (key.endsWith("m")) harmony = "i";
+        }
 
         /* By our design, chords will be generated so that if one staff has a quicker duration than the
         other, it will maintain the same chord as the slower staff until that harmony is over. For example,
@@ -335,7 +347,7 @@ const generateNotes = function (key = "C",
             for (let i = 0; i < arrTop.length; i++) {
                 arrTop[i] = new Chord(key, topMin, topMax, topNumOfPitches, topDuration, harmony);
                 for (let k = 0; k < diff; k++) arrBot[i * diff + k] = new Chord(key, botMin, botMax, botNumOfPitches, botDuration, harmony);
-                let harmony_arr = CHORDS.get(harmony);
+                let harmony_arr = chords.get(harmony);
                 harmony = harmony_arr[Math.floor(Math.random() * harmony_arr.length)];
             }
         } else {
@@ -345,7 +357,7 @@ const generateNotes = function (key = "C",
             for (let i = 0; i < arrBot.length; i++) {
                 arrBot[i] = new Chord(key, botMin, botMax, botNumOfPitches, botDuration, harmony);
                 for (let k = 0; k < diff; k++) arrTop[i * diff + k] = new Chord(key, topMin, topMax, topNumOfPitches, topDuration, harmony);
-                let harmony_arr = CHORDS.get(harmony);
+                let harmony_arr = chords.get(harmony);
                 harmony = harmony_arr[Math.floor(Math.random() * harmony_arr.length)];
             }
         }

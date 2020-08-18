@@ -106,13 +106,23 @@ KEY_SIGNATURES.set("Abm", makeScaleMinor("A", 8, 5, FLATS, 7));
 // HARMONY
 /* The following chord progression rules are used for random generization. Note that 
 for know we are only considering the major keys. */
-const CHORDS = new Map();
-CHORDS.set("I", ["I", "ii", "iii", "IV", "V", "vi", "viio"]);
-CHORDS.set("ii", ["viio", "V"]);
-CHORDS.set("iii", ["vi"]);
-CHORDS.set("IV", ["ii", "viio", "V"]);
-CHORDS.set("V", ["I", "vi"]);
-CHORDS.set("vi", ["IV", "ii"]);
-CHORDS.set("viio", ["I"]);
+const CHORDS_MAJOR = new Map();
+CHORDS_MAJOR.set("I", ["ii", "iii", "IV", "V", "vi", "viio"]);
+CHORDS_MAJOR.set("ii", ["viio", "V"]);
+CHORDS_MAJOR.set("iii", ["vi"]);
+CHORDS_MAJOR.set("IV", ["ii", "viio", "V"]);
+CHORDS_MAJOR.set("V", ["I", "vi"]);
+CHORDS_MAJOR.set("vi", ["IV", "ii"]);
+CHORDS_MAJOR.set("viio", ["I"]);
 
-export { KEY_SIGNATURES, LETTERS, CHORDS }
+const CHORDS_MINOR = new Map();
+CHORDS_MINOR.set("i", ["iio", "III", "iv", "V", "VI", "VII"]);
+CHORDS_MINOR.set("iio", ["viio", "V"]);
+CHORDS_MINOR.set("III", ["VI", "iv", "iio"]);
+CHORDS_MINOR.set("iv", ["iio", "viio", "V"]);
+CHORDS_MINOR.set("V", ["VI", "i"]);
+CHORDS_MINOR.set("VI", ["iv", "iio"]);
+CHORDS_MINOR.set("viio", ["i"]);
+CHORDS_MINOR.set("VII", ["III"])
+
+export { KEY_SIGNATURES, LETTERS, CHORDS_MAJOR, CHORDS_MINOR }
