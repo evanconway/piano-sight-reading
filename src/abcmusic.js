@@ -4,6 +4,7 @@ import { generateNotes, getPitchStringFromIndex } from "./chord";
 const MIDI_TIMING_ARRAY = []; // setup in generateMidiTimingArr()
 const COLOR_SELECT = "#00AA00";
 const COLOR_DEF = "#000000";
+const COLOR_WRONG = "#CC0000";
 const BASE_DURATION = 48; // this is actually the denominator of the default timing
 const DURATIONS = new Map();
 DURATIONS.set("Whole", BASE_DURATION);
@@ -46,15 +47,15 @@ const HARMONY_BUTTON = document.querySelector(".harmony");
 let playCursor = 0;
 
 // sets play cursor to given index
-const cursorSet = function(timeIndex) {
+const cursorSet = function(timeIndex, color = COLOR_SELECT) {
     // the index here is for the timing array
     playCursor = timeIndex;
     NOTES_TOP.forEach(e => {
-        if (e.timingIndex === playCursor) e.path.setAttribute("fill", COLOR_SELECT);
+        if (e.timingIndex === playCursor) e.path.setAttribute("fill", color);
         else e.path.setAttribute("fill", COLOR_DEF);
     });
     NOTES_BOT.forEach(e => {
-        if (e.timingIndex === playCursor) e.path.setAttribute("fill", COLOR_SELECT);
+        if (e.timingIndex === playCursor) e.path.setAttribute("fill", color);
         else e.path.setAttribute("fill", COLOR_DEF);
     });
 }
@@ -70,6 +71,10 @@ const playedCorrect = function(midiArr = []) {
         if (!MIDI_TIMING_ARRAY[playCursor].includes(e)) result = false;
     })
     return result;
+}
+
+const playedWrong = function() {
+    cursorSet(playCursor, COLOR_WRONG);
 }
 
 // move cursor forward to next valid set of notes
@@ -363,4 +368,4 @@ HARMONY_BUTTON.addEventListener("click", e => {
     makeMusic();
 })
 
-export { cursorAdv, cursorBck, playedCorrect, makeMusic }
+export { cursorAdv, cursorBck, playedCorrect, playedWrong, makeMusic }

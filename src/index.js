@@ -1,5 +1,5 @@
 import "./styles.css";
-import { cursorAdv, cursorBck, playedCorrect, makeMusic} from "./abcmusic"
+import { cursorAdv, cursorBck, playedCorrect, playedWrong, makeMusic} from "./abcmusic"
 
 // this is the array where we will keep track of what notes the user is playing
 const MIDI_PLAYED = [];
@@ -19,7 +19,7 @@ const notePlayed = function(midi) {
 		let adv = cursorAdv();
 		if (!adv) makeMusic(false);
 		MIDI_PLAYED.length = 0;
-	}
+	} else playedWrong();
 }
 
 function add_msg_handlers(controllers) {
