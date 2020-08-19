@@ -13,13 +13,21 @@ const playDel = function(midi) {
 	if (i >= 0) MIDI_PLAYED.splice(i, 1);
 }
 
+let notesWrong = false; // marked true when wrong notes played
 const notePlayed = function(midi) {
 	playAdd(midi);
 	if (playedCorrect(MIDI_PLAYED)) {
+		notesWrong = false;
 		let adv = cursorAdv();
 		if (!adv) makeMusic(false);
 		MIDI_PLAYED.length = 0;
-	} else playedWrong();
+	} else {
+		// Color the cursor red, but give user 100ms of time to get it right.
+		notesWrong = true;
+		setTimeout(() => {
+			if (notesWrong) playedWrong();
+		}, 100)
+	}
 }
 
 function add_msg_handlers(controllers) {
