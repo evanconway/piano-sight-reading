@@ -50,13 +50,11 @@ function onfullfilled(midiaccess) {
 	let controllers = midiaccess.inputs.values()
 	add_msg_handlers(controllers);
 	midiaccess.onstatechange = () => add_msg_handlers(controllers);
-	makeMusic();
 }
 
 function onFail(err) {
 	console.log(err);
-	let score = document.querySelector(".score");
-	score.innerHTML = `<h1>No Midi Access!</h1>
+	document.querySelector(".score").innerHTML = `<h1>No Midi Access!</h1>
 						<p>It looks like this browser supports the Web Midi api, but no midi connection could be made!
 						Please check that your device is connected properly and refresh the page.
 						</p>`
@@ -69,10 +67,10 @@ try {
 		.catch(onFail);
 } catch (err) {
 	console.log(err);
-	let score = document.querySelector(".score");
-	score.innerHTML = `<h1>This Browser Is Not Supported :(</h1>
-						<p>Oh no! It looks like this browser doesn't support the Web Midi api. Please try using google 
-							chrome or another browser that supports the Web Midi api.
-						</p>`
+	document.querySelector(".warning").innerHTML = `<h1>This Browser Is Not Supported :(</h1>
+													<p>Oh no! It looks like this browser doesn't support the Web Midi api. Please try using google 
+														chrome or another browser that supports the Web Midi api.
+													</p>`
 }
 
+makeMusic();
