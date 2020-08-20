@@ -219,7 +219,6 @@ const generateMidiTimingArr = function() {
         });
         index += e.duration;
     })
-    console.log(MIDI_TIMING_ARRAY);
     return MIDI_TIMING_ARRAY
 }
 

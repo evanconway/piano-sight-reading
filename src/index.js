@@ -4,6 +4,11 @@ import { cursorAdv, cursorBck, playedCorrect, playedWrong, makeMusic} from "./ab
 // this is the array where we will keep track of what notes the user is playing
 const MIDI_PLAYED = [];
 
+document.addEventListener('keydown', e => {
+	if (e.code === "ArrowRight") cursorAdv();
+	if (e.code === "ArrowLeft") cursorBck();
+});
+
 const playAdd = function(midi) {
 	if (!MIDI_PLAYED.includes(midi)) MIDI_PLAYED.push(midi);
 }
@@ -45,15 +50,29 @@ function onfullfilled(midiaccess) {
 	let controllers = midiaccess.inputs.values()
 	add_msg_handlers(controllers);
 	midiaccess.onstatechange = () => add_msg_handlers(controllers);
+	makeMusic();
 }
 
-navigator.requestMIDIAccess()
-	.then(onfullfilled)
-	.catch(err => console.log(err));
+function onFail(err) {
+	console.log(err);
+	let score = document.querySelector(".score");
+	score.innerHTML = `<h1>No Midi Access!</h1>
+						<p>It looks like this browser supports the Web Midi api, but no midi connection could be made!
+						Please check that your device is connected properly and refresh the page.
+						</p>`
 
-document.addEventListener('keydown', e => {
-	if (e.code === "ArrowRight") cursorAdv();
-	if (e.code === "ArrowLeft") cursorBck();
-});
+}
 
-makeMusic();
+try {
+	navigator.requestMIDIAccess()
+		.then(onfullfilled)
+		.catch(onFail);
+} catch (err) {
+	console.log(err);
+	let score = document.querySelector(".score");
+	score.innerHTML = `<h1>This Browser Is Not Supported :(</h1>
+						<p>Oh no! It looks like this browser doesn't support the Web Midi api. Please try using google 
+							chrome or another browser that supports the Web Midi api.
+						</p>`
+}
+

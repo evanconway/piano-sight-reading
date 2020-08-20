@@ -17,7 +17,8 @@
   },
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback --inline --progress",
-    "build": "webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "abcjs": "^5.12.0",
