@@ -77,6 +77,10 @@ const playedWrong = function() {
     cursorSet(playCursor, COLOR_WRONG);
 }
 
+const getCorrectMidi = function() {
+    return MIDI_TIMING_ARRAY[playCursor];
+}
+
 // move cursor forward to next valid set of notes
 // returns true if cursor was advanced, false if it couldn't (at end)
 const cursorAdv = function() {
@@ -293,7 +297,7 @@ const makeMusic = function (resetHarmony = true) {
         rect.parentNode.replaceChild(clone, rect);
     })
 
-	/* We need to be able to refer to the html to change the color of notes. We do that
+    /* We need to be able to refer to the html to change the color of notes. We do that
 	with query selectors. The generateABC function does more than create strings. It also
 	creates music objects that represent the music. The assign paths function gives
 	these objects references to their own html elements. */
@@ -367,4 +371,4 @@ HARMONY_BUTTON.addEventListener("click", e => {
     makeMusic();
 })
 
-export { cursorAdv, cursorBck, playedCorrect, playedWrong, makeMusic }
+export { cursorAdv, cursorBck, playedCorrect, playedWrong, getCorrectMidi, makeMusic }

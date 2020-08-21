@@ -1,5 +1,5 @@
 import "./styles.css";
-import { cursorAdv, cursorBck, playedCorrect, playedWrong, makeMusic} from "./abcmusic"
+import { cursorAdv, cursorBck, playedCorrect, playedWrong, getCorrectMidi, makeMusic} from "./abcmusic"
 
 // this is the array where we will keep track of what notes the user is playing
 const MIDI_PLAYED = [];
@@ -21,7 +21,10 @@ const playDel = function(midi) {
 let notesWrong = false; // marked true when wrong notes played
 const notePlayed = function(midi) {
 	playAdd(midi);
+	console.log("You played: " + MIDI_PLAYED);
+	console.log("Correct is: " + getCorrectMidi());
 	if (playedCorrect(MIDI_PLAYED)) {
+		console.log("Correct!");
 		notesWrong = false;
 		let adv = cursorAdv();
 		if (!adv) makeMusic(false);
