@@ -41,10 +41,14 @@ const notePlayed = function(midi) {
 function add_msg_handlers(controllers) {
 	for (let input of controllers) {
 		input.onmidimessage = (msg) => {
+			//console.log("Midi code is: " + msg.data[0]);
 			if (msg.data[0] === 144) {
 				if (msg.data[2] > 0) notePlayed(msg.data[1]);
-				else playDel(msg.data[1]);
 			} 
+			if (msg.data[0] === 144) {
+				if (msg.data[2] === 0) playDel(msg.data[1]);
+			}
+			if (msg.data[0] === 128) playDel(msg.data[1]);
 		}
 	}
 }
