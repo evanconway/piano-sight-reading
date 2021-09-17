@@ -1,3 +1,6 @@
+# What is this?
+This is a sight-reading app designed for the piano. It generates music according to user-set options, and reads input from a midi device. 
+
 # Why use this app?
 One of the most important parts of learning sight-reading is finding music to read that's exactly the right difficulty level. If it's too easy your skills won't be challenged. But if it's too hard you won't be able to play at a musical speed and you won't have any fun. At the same time, one of the most difficult parts of learning sight reading is finding enough material to practice with. Once you've read something once, you can't use it again because then you're not sight reading. This app solves that problem! It randomly generates an infinite amount of music according to your needs.
 
