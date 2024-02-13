@@ -1,4 +1,4 @@
-Live Link: https://aceofheart5.github.io/piano-sight-reading/
+Live Link: https://evanconway.github.io/piano-sight-reading/
 
 # What is this?
 This is a sight-reading app designed for the piano. It generates music according to user-set options, and reads input from a midi device. 
